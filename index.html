@@ -1,0 +1,4996 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>亚马逊运营工具箱</title>
+<style>
+:root {
+  --bg: #0A0A0A;
+  --bg-card: #111;
+  --bg-input: #111;
+  --bg-nav: #0A0A0A;
+  --text: #fff;
+  --text-secondary: #aaa;
+  --text-muted: #555;
+  --border: #2a2a2a;
+  --border-light: #333;
+  --accent: #3B82F6;
+  --accent-dim: rgba(59,130,246,0.15);
+  --danger: #EF4444;
+  --success: #22C55E;
+  --warn: #F59E0B;
+  --radius: 12px;
+  --glass-bg: rgba(255,255,255,0.04);
+  --glass-border: rgba(255,255,255,0.08);
+}
+
+body.light {
+  --bg: #FFFFFF;
+  --bg-card: #F9FAFB;
+  --bg-input: #F9FAFB;
+  --bg-nav: #FFFFFF;
+  --text: #111827;
+  --text-secondary: #6B7280;
+  --text-muted: #9CA3AF;
+  --border: #E5E7EB;
+  --border-light: #D1D5DB;
+  --glass-bg: rgba(0,0,0,0.02);
+  --glass-border: rgba(0,0,0,0.06);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  min-height: 100vh;
+  padding-top: 52px;
+  transition: background-color 300ms ease, color 300ms ease;
+}
+
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--border-light);
+  background: var(--bg-nav);
+  transition: background-color 300ms ease, border-color 300ms ease;
+}
+
+nav a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 14px;
+  padding: 14px 20px;
+  display: inline-block;
+  border-bottom: 2px solid transparent;
+  transition: color 300ms ease, border-color 300ms ease;
+}
+
+nav a:hover {
+  color: var(--text);
+}
+
+nav a.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.theme-toggle {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 300ms ease;
+  border-radius: var(--radius);
+}
+
+.theme-toggle:hover {
+  color: var(--text);
+}
+
+.theme-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+.sun-icon { display: none; }
+.moon-icon { display: block; }
+body.light .sun-icon { display: block; }
+body.light .moon-icon { display: none; }
+
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 72px);
+  padding: 60px 20px;
+}
+
+.hero h1 {
+  font-size: 28px;
+  font-weight: 300;
+  letter-spacing: 4px;
+  margin-bottom: 48px;
+  color: var(--text);
+}
+
+.card-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+  max-width: 900px;
+  width: 100%;
+}
+
+.card {
+  flex: 0 1 280px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 32px 20px;
+  text-align: center;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--text);
+  border-radius: var(--radius);
+  transition: background-color 300ms ease, border-color 300ms ease;
+}
+
+.card:hover {
+  background: var(--bg-input);
+  border-color: var(--accent);
+}
+
+.card-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.card-title {
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 1px;
+}
+
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 72px);
+  font-size: 20px;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+}
+
+/* ===== 标题检测页 ===== */
+.tool-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 40px 24px;
+  min-height: calc(100vh - 72px);
+}
+
+.tool-page h2 {
+  font-size: 22px;
+  font-weight: 300;
+  letter-spacing: 2px;
+  margin-bottom: 36px;
+  text-align: center;
+  color: var(--text);
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--text-secondary);
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  transition: color 300ms ease;
+}
+
+.form-label span {
+  color: var(--text-muted);
+  font-size: 12px;
+  transition: color 300ms ease;
+}
+
+textarea {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  padding: 14px 16px;
+  resize: vertical;
+  outline: none;
+  line-height: 1.6;
+  min-height: 60px;
+  border-radius: var(--radius);
+  transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease;
+}
+
+textarea:focus {
+  border-color: var(--accent);
+}
+
+textarea#bulletInput {
+  min-height: 160px;
+}
+
+.btn-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.btn-detect {
+  flex: 1;
+  padding: 12px 0;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  font-size: 14px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  font-family: inherit;
+  border-radius: var(--radius);
+  transition: background-color 300ms ease;
+}
+
+.btn-detect:hover {
+  opacity: 0.9;
+}
+
+.btn-outline {
+  padding: 12px 20px;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  font-size: 13px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  font-family: inherit;
+  border-radius: var(--radius);
+  transition: color 300ms ease, border-color 300ms ease, background-color 300ms ease;
+}
+
+.btn-outline:hover {
+  color: var(--text);
+  border-color: var(--text-secondary);
+}
+
+.result-section {
+  margin-top: 36px;
+  display: none;
+}
+
+.result-section.show {
+  display: block;
+}
+
+/* ===== 汇总面板 ===== */
+.summary-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 28px 32px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  text-align: center;
+  margin-bottom: 28px;
+  transition: background-color 300ms ease, border-color 300ms ease;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.summary-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  transition: color 300ms ease;
+}
+
+.summary-value {
+  font-size: 32px;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+.summary-value.rate-green  { color: var(--success); }
+.summary-value.rate-yellow { color: var(--warn); }
+.summary-value.rate-red    { color: var(--danger); }
+
+/* ===== 违规词详情 ===== */
+.detail-block {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 20px;
+  transition: background-color 300ms ease, border-color 300ms ease;
+}
+
+.detail-block h3 {
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.detail-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.detail-table th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  transition: color 300ms ease, border-color 300ms ease;
+}
+
+.detail-table td {
+  font-size: 13px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  line-height: 1.6;
+  transition: color 300ms ease, border-color 300ms ease;
+}
+
+.detail-table tr:last-child td {
+  border-bottom: none;
+}
+
+.word-highlight {
+  color: var(--danger);
+  font-weight: 500;
+}
+
+.word-source {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-left: 6px;
+}
+
+.btn-copy {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 12px;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: 1px;
+  border-radius: var(--radius);
+  transition: color 300ms ease, border-color 300ms ease, background-color 300ms ease;
+}
+
+.btn-copy:hover {
+  color: var(--text);
+  border-color: var(--text-secondary);
+}
+
+.result-empty {
+  color: var(--success);
+  font-size: 13px;
+  padding: 20px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.copy-toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  padding: 10px 24px;
+  border-radius: var(--radius);
+  letter-spacing: 1px;
+  z-index: 3001;
+  opacity: 0;
+  transition: opacity 300ms ease;
+  pointer-events: none;
+}
+
+.copy-toast.show {
+  opacity: 1;
+}
+
+.toast-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.35);
+  z-index: 3000;
+  opacity: 0;
+  transition: opacity 300ms ease;
+  pointer-events: none;
+}
+
+.toast-backdrop.show {
+  opacity: 1;
+}
+
+/* ===== 原文高亮预览 ===== */
+.highlight-preview {
+  margin-top: 24px;
+}
+
+.highlight-preview h4 {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+.highlight-text {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  font-size: 14px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text);
+  transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease;
+}
+
+.hl-mark {
+  background: rgba(239,68,68,0.3);
+  border-radius: 3px;
+  padding: 1px 2px;
+  transition: background-color 0.3s ease;
+  scroll-margin-top: 80px;
+}
+
+.hl-mark.flash {
+  background: #EF4444;
+}
+
+.source-link {
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 13px;
+  border-bottom: 1px dashed var(--accent);
+  transition: opacity 200ms ease;
+}
+
+.source-link:hover {
+  opacity: 0.7;
+}
+
+.summary-value.vcount {
+  color: #EF4444;
+  font-weight: 600;
+}
+
+/* ===== 主图检测页 ===== */
+.image-tool-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 24px;
+  min-height: calc(100vh - 72px);
+}
+
+.image-tool-page h2 {
+  font-size: 22px;
+  font-weight: 300;
+  letter-spacing: 2px;
+  margin-bottom: 36px;
+  text-align: center;
+  color: var(--text);
+}
+
+.upload-zone {
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 48px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 300ms ease, background-color 300ms ease;
+  margin-bottom: 20px;
+}
+
+.upload-zone:hover,
+.upload-zone.drag-over {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.upload-zone p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.upload-zone .sub {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.upload-zone input[type="file"] {
+  display: none;
+}
+
+.progress-bar-wrap {
+  display: none;
+  width: 100%;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin-top: 16px;
+  overflow: hidden;
+}
+
+.progress-bar-wrap.show {
+  display: block;
+}
+
+.progress-bar-inner {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  width: 0%;
+  transition: width 200ms ease;
+}
+
+.image-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.thumb-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  position: relative;
+  transition: border-color 300ms ease, background-color 300ms ease;
+}
+
+.thumb-card .thumb-img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  display: block;
+  cursor: pointer;
+  background: #1a1a1a;
+}
+
+.thumb-card .thumb-info {
+  padding: 10px 12px;
+}
+
+.thumb-card .thumb-name {
+  font-size: 11px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.thumb-card .thumb-size {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.thumb-card .thumb-delete {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  background: rgba(0,0,0,0.7);
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 200ms ease;
+  line-height: 1;
+}
+
+.thumb-card:hover .thumb-delete {
+  opacity: 1;
+}
+
+.image-btn-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.image-btn-row .btn-outline {
+  flex: 1;
+  text-align: center;
+}
+
+/* ===== 检测结果 ===== */
+.image-result-section {
+  display: none;
+  margin-top: 12px;
+}
+
+.image-result-section.show {
+  display: block;
+}
+
+.image-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+  transition: background-color 300ms ease, border-color 300ms ease;
+}
+
+.image-card-inner {
+  display: flex;
+  gap: 20px;
+}
+
+.image-card-preview {
+  flex-shrink: 0;
+  width: 160px;
+  height: 160px;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #1a1a1a;
+}
+
+.image-card-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.image-card-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.image-card-name {
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 4px;
+  word-break: break-all;
+}
+
+.image-card-size {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.check-icon {
+  flex-shrink: 0;
+  width: 18px;
+  text-align: center;
+}
+
+.check-pass { color: var(--success); }
+.check-fail { color: var(--danger); }
+
+.check-text-pass { color: var(--text-secondary); }
+.check-text-fail { color: var(--danger); }
+
+.fix-suggestion {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: var(--accent-dim);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--accent);
+  line-height: 1.6;
+  transition: background-color 300ms ease;
+}
+
+/* ===== 灯箱 ===== */
+.lightbox {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.92);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.lightbox.show {
+  display: flex;
+}
+
+.lightbox img {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  border-radius: var(--radius);
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  color: #fff;
+  font-size: 28px;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  line-height: 1;
+}
+
+.lightbox-close:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+/* ===== 加载动画 ===== */
+.loading-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  z-index: 999;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.loading-overlay.show {
+  display: flex;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  letter-spacing: 1px;
+}
+/* ===== 关键词提取页 ===== */
+input[type="text"].kw-url-input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  padding: 12px 16px;
+  outline: none;
+  border-radius: var(--radius);
+  transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease;
+}
+
+input[type="text"].kw-url-input:focus {
+  border-color: var(--accent);
+}
+
+.kw-asin-badge {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 1px;
+  background: var(--accent-dim);
+  padding: 2px 10px;
+  border-radius: 4px;
+}
+
+.kw-result-section {
+  margin-top: 28px;
+  display: none;
+}
+
+.kw-result-section.show {
+  display: block;
+}
+
+.kw-category-block {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  transition: background-color 300ms ease, border-color 300ms ease;
+}
+
+.kw-category-block h3 {
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.kw-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.kw-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 5px 12px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 300ms ease, background-color 300ms ease, color 300ms ease;
+}
+
+.kw-tag:hover {
+  border-color: var(--accent);
+}
+
+.kw-tag .kw-freq {
+  font-size: 10px;
+  color: var(--text-muted);
+  background: var(--bg-input);
+  border-radius: 4px;
+  padding: 1px 5px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.kw-tag .kw-copy-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 0 2px;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 200ms ease, color 200ms ease;
+}
+
+.kw-tag:hover .kw-copy-btn {
+  opacity: 1;
+}
+
+.kw-tag .kw-copy-btn:hover {
+  color: var(--accent);
+}
+
+.kw-tag.kw-flash {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.kw-selling-block {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  transition: background-color 300ms ease, border-color 300ms ease;
+}
+
+.kw-selling-block h3 {
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+
+.kw-selling-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.kw-selling-item {
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.kw-selling-item .kw-selling-label {
+  color: var(--text-muted);
+  font-size: 11px;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.kw-selling-item .kw-selling-text {
+  color: var(--text);
+}
+
+.kw-highlight-preview {
+  margin-top: 20px;
+}
+
+.kw-highlight-preview h4 {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+.kw-highlight-text {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  font-size: 14px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text);
+  max-height: 340px;
+  overflow-y: auto;
+  transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease;
+}
+
+.kw-hl-mark {
+  background: rgba(239,68,68,0.3);
+  border-radius: 3px;
+  padding: 1px 2px;
+  transition: background-color 0.3s ease;
+}
+
+.kw-hl-mark.kw-hl-flash {
+  background: #EF4444;
+}
+
+.kw-empty-hint {
+  text-align: center;
+  padding: 32px 24px;
+  color: var(--text-muted);
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+.kw-anomaly-tip {
+  padding: 10px 14px;
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.25);
+  border-radius: var(--radius);
+  font-size: 12px;
+  color: var(--danger);
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+/* ===== 利润核算页 ===== */
+.pc-input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  padding: 10px 14px;
+  outline: none;
+  border-radius: var(--radius);
+  transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease;
+}
+
+.pc-input:focus { border-color: var(--accent); }
+
+.pc-select {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  padding: 10px 14px;
+  outline: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+  transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease;
+}
+
+.pc-select:focus { border-color: var(--accent); }
+
+.pc-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pc-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  outline: none;
+}
+
+.pc-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: none;
+}
+
+.pc-slider-val {
+  font-size: 13px;
+  color: var(--text);
+  min-width: 42px;
+  text-align: right;
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
+.pc-rate-info {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 6px;
+  letter-spacing: 1px;
+}
+
+.pc-section-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  transition: background-color 300ms ease, border-color 300ms ease;
+}
+
+.pc-section-card h3 {
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+
+.pc-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.pc-row.three { grid-template-columns: 1fr 1fr 1fr; }
+
+.pc-col-full { grid-column: 1 / -1; }
+
+.pc-input-unit {
+  position: relative;
+}
+
+.pc-input-unit .pc-unit {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.pc-input-unit .pc-input { padding-right: 32px; }
+
+.pc-config-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  transition: background-color 300ms ease, border-color 300ms ease;
+}
+
+.pc-result-section {
+  margin-top: 28px;
+  display: none;
+}
+
+.pc-result-section.show { display: block; }
+
+.pc-bill-block {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  transition: background-color 300ms ease, border-color 300ms ease;
+}
+
+.pc-bill-block h3 {
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+}
+
+.pc-bill-table { width: 100%; border-collapse: collapse; }
+
+.pc-bill-table td {
+  font-size: 13px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  transition: color 300ms ease, border-color 300ms ease;
+}
+
+.pc-bill-table td:last-child { text-align: right; font-weight: 500; }
+
+.pc-bill-table .pc-bill-cat {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  padding-top: 16px;
+  border-bottom: none;
+}
+
+.pc-bill-table .pc-bill-total td {
+  font-size: 14px;
+  font-weight: 500;
+  border-bottom: none;
+  padding-top: 14px;
+  color: var(--text);
+}
+
+.pc-bill-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.pc-dot-fixed { background: #6366F1; }
+.pc-dot-variable { background: var(--warn); }
+.pc-dot-platform { background: var(--accent); }
+.pc-dot-marketing { background: var(--danger); }
+
+.pc-suggest-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.pc-suggest-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 16px;
+  text-align: center;
+  transition: background-color 300ms ease, border-color 300ms ease;
+}
+
+.pc-suggest-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.pc-suggest-price {
+  font-size: 24px;
+  font-weight: 300;
+  letter-spacing: 1px;
+  color: var(--text);
+}
+
+.pc-suggest-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.pc-suggest-card.break-even .pc-suggest-price { color: var(--danger); }
+.pc-suggest-card.normal .pc-suggest-price { color: var(--warn); }
+.pc-suggest-card.high .pc-suggest-price { color: var(--success); }
+
+.pc-loss-warn {
+  padding: 10px 14px;
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.25);
+  border-radius: var(--radius);
+  font-size: 12px;
+  color: var(--danger);
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+/* ===== 运营辅助工具合集 ===== */
+.ot-section-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 20px;
+  transition: background-color 300ms ease, border-color 300ms ease;
+}
+
+.ot-section-card h3 {
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  color: var(--text);
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  transition: border-color 300ms ease;
+}
+
+.ot-output-box {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  font-size: 14px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text);
+  min-height: 80px;
+  max-height: 260px;
+  overflow-y: auto;
+  transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease;
+}
+
+.ot-cat-list { margin-top: 14px; }
+
+.ot-cat-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  transition: border-color 300ms ease, background-color 300ms ease;
+}
+
+.ot-cat-item:hover { border-color: var(--accent); }
+
+.ot-cat-path {
+  font-size: 13px;
+  color: var(--text);
+  flex: 1;
+  min-width: 0;
+}
+
+.ot-cat-path .ot-cat-sep {
+  color: var(--text-muted);
+  margin: 0 6px;
+}
+
+.ot-priority-badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 1px;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.ot-priority-high { background: rgba(34,197,94,0.15); color: var(--success); }
+.ot-priority-medium { background: rgba(59,130,246,0.15); color: var(--accent); }
+.ot-priority-low { background: rgba(148,163,184,0.12); color: var(--text-muted); }
+
+.ot-estimate-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.ot-estimate-item {
+  text-align: center;
+  padding: 18px 12px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  transition: border-color 300ms ease, background-color 300ms ease;
+}
+
+.ot-estimate-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.ot-estimate-value {
+  font-size: 28px;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+.ot-estimate-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.ot-val-safe { color: var(--success); }
+.ot-val-warn { color: var(--warn); }
+.ot-val-total { color: var(--accent); }
+
+.ot-empty-hint {
+  color: var(--text-muted);
+  font-size: 13px;
+  text-align: center;
+  padding: 16px;
+  letter-spacing: 1px;
+}
+
+/* ===== 会员按钮 ===== */
+.vip-btn {
+  margin-left: 8px;
+  padding: 6px 14px;
+  background: linear-gradient(135deg, #F59E0B, #D97706);
+  color: #fff;
+  border: none;
+  font-size: 12px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  font-family: inherit;
+  border-radius: var(--radius);
+  transition: opacity 300ms ease;
+  white-space: nowrap;
+}
+.vip-btn:hover { opacity: 0.85; }
+.vip-btn.active-member {
+  background: linear-gradient(135deg, #22C55E, #16A34A);
+}
+
+/* ===== 通用弹窗 ===== */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.75);
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.show { display: flex; }
+
+.modal-dialog {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  max-width: 520px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+  transition: background-color 300ms ease, border-color 300ms ease;
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  margin-bottom: 24px;
+  color: var(--text);
+}
+
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-size: 20px;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 300ms ease, background-color 300ms ease;
+}
+.modal-close:hover { color: var(--text); background: var(--glass-bg); }
+
+/* ===== 套餐卡片 ===== */
+.plan-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.plan-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: center;
+  transition: border-color 300ms ease;
+  cursor: default;
+}
+.plan-card:hover { border-color: var(--accent); }
+.plan-card.featured { border-color: var(--warn); }
+
+.plan-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+.plan-price {
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--accent);
+  letter-spacing: 1px;
+}
+.plan-price .plan-unit {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+.plan-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+.plan-qr {
+  width: 160px;
+  height: 160px;
+  margin: 12px auto 8px;
+  display: block;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  object-fit: contain;
+  background: #fff;
+}
+.plan-qr-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.modal-note {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+  letter-spacing: 0.5px;
+}
+
+/* ===== 管理员入口 ===== */
+.admin-gear {
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  padding: 8px;
+  background: transparent;
+  border: none;
+  z-index: 3000;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.admin-gear svg {
+  width: 24px;
+  height: 24px;
+  fill: #aaa;
+  display: block;
+  transition: fill 180ms ease, transform 120ms ease;
+}
+.admin-gear:hover svg {
+  fill: #555;
+}
+.admin-gear:active svg {
+  transform: scale(0.85);
+}
+.admin-gear::after {
+  content: '管理员入口';
+  position: absolute;
+  right: 42px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(30,30,30,0.88);
+  color: #ccc;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 200ms ease;
+  letter-spacing: 1px;
+}
+.admin-gear:hover::after {
+  opacity: 1;
+}
+
+/* ===== 页脚 ===== */
+.site-footer {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  text-align: center;
+  padding: 0 16px;
+  font-size: 12px;
+  color: #999;
+  letter-spacing: 1px;
+  user-select: none;
+}
+
+/* ===== 管理员面板 ===== */
+.admin-form { margin-bottom: 16px; }
+.admin-form .form-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+  display: block;
+}
+.admin-form input, .admin-form select {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease;
+}
+.admin-form input:focus, .admin-form select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  font-size: 12px;
+}
+.admin-table th, .admin-table td {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.admin-table th { color: var(--text-muted); font-weight: 400; letter-spacing: 1px; }
+.admin-table td { color: var(--text); }
+.admin-del-btn {
+  background: none;
+  border: none;
+  color: var(--danger);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.admin-del-btn:hover { background: rgba(239,68,68,0.1); }
+
+/* ===== 激活会员弹窗 ===== */
+.activate-cooldown { font-size:12px;color:var(--warn);text-align:center;margin-top:8px;letter-spacing:1px; }
+
+/* ===== 水印 ===== */
+.watermark-overlay {
+  position: fixed;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;z-index:9999;overflow:hidden;
+}
+.watermark-overlay span {
+  position:absolute;font-size:14px;color:rgba(128,128,128,0.06);
+  white-space:nowrap;transform:rotate(-25deg);user-select:none;
+  letter-spacing:2px;
+}
+
+/* ===== 到期提醒 ===== */
+.expiry-banner {
+  background: rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);
+  border-radius:var(--radius);padding:10px 16px;font-size:12px;
+  color:var(--warn);letter-spacing:1px;text-align:center;margin-bottom:16px;
+  display:none;
+}
+.expiry-banner.show { display:block; }
+
+/* ===== 操作日志 ===== */
+.admin-log { max-height:200px;overflow-y:auto;margin-top:12px;font-size:11px; }
+.admin-log-item { padding:4px 0;border-bottom:1px solid var(--border);color:var(--text-muted);letter-spacing:0.5px; }
+
+/* ===== 手机端适配 ===== */
+@media (max-width:640px) {
+  nav { padding:0 6px;gap:0; }
+  nav a { font-size:11px;padding:10px 6px; }
+  .vip-btn { font-size:10px;padding:4px 8px;margin-left:4px; }
+  .modal-dialog { padding:20px;max-width:95%; }
+  .plan-qr { width:120px;height:120px; }
+  .plan-price { font-size:22px; }
+  .card-grid { gap:12px; }
+  .card { padding:20px 16px; }
+  .hero h1 { font-size:20px; }
+  .admin-table { font-size:10px; }
+  .admin-table th, .admin-table td { padding:4px 6px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#home" class="active" onclick="showPage('home', this)">首页</a>
+  <a href="#title-check" onclick="showPage('title-check', this)">标题检测</a>
+  <a href="#image-check" onclick="showPage('image-check', this)">主图检测</a>
+  <a href="#profit-calc" onclick="showPage('profit-calc', this)">利润核算</a>
+  <a href="#keyword-extract" onclick="showPage('keyword-extract', this)">关键词提取</a>
+  <a href="#ops-tools" onclick="showPage('ops-tools', this)">运营工具</a>
+  <button class="theme-toggle" onclick="toggleTheme()" title="切换主题">
+    <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="5"/>
+      <line x1="12" y1="1" x2="12" y2="3"/>
+      <line x1="12" y1="21" x2="12" y2="23"/>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+      <line x1="1" y1="12" x2="3" y2="12"/>
+      <line x1="21" y1="12" x2="23" y2="12"/>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </svg>
+    <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+  </button>
+  <button class="vip-btn" id="vipBtn" onclick="showVIPModal()">开通会员</button>
+  <button class="vip-btn" id="activateBtn" style="background:linear-gradient(135deg,#3B82F6,#2563EB)" onclick="showActivateModal()">激活会员</button>
+</nav>
+
+<div id="home" class="page active">
+  <div class="hero">
+    <h1>亚马逊运营工具箱</h1>
+    <div class="card-grid">
+      <a href="#title-check" class="card" onclick="navigateTo('title-check')">
+        <span class="card-icon">Aa</span>
+        <div class="card-title">标题检测</div>
+      </a>
+      <a href="#image-check" class="card" onclick="navigateTo('image-check')">
+        <span class="card-icon">&#9638;</span>
+        <div class="card-title">主图检测</div>
+      </a>
+      <a href="#profit-calc" class="card" onclick="navigateTo('profit-calc')">
+        <span class="card-icon">$</span>
+        <div class="card-title">利润核算</div>
+      </a>
+      <a href="#keyword-extract" class="card" onclick="navigateTo('keyword-extract')">
+        <span class="card-icon">#</span>
+        <div class="card-title">关键词提取</div>
+      </a>
+      <a href="#ops-tools" class="card" onclick="navigateTo('ops-tools')">
+        <span class="card-icon">&#9881;</span>
+        <div class="card-title">运营工具</div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div id="title-check" class="page">
+  <div class="tool-page">
+    <h2>标题 &amp; 五点检测</h2>
+    <div class="form-group">
+      <div class="form-label">
+        产品标题
+        <span id="titleCount">0 字符</span>
+      </div>
+      <textarea id="titleInput" placeholder="请输入产品标题..." spellcheck="false" oninput="updateTitleCount()"></textarea>
+    </div>
+    <div class="form-group">
+      <div class="form-label">
+        五点描述
+        <span id="bulletCount">0 字符</span>
+      </div>
+      <textarea id="bulletInput" placeholder="输入描述内容，条数不限&#10;可输入任意数量的描述点" spellcheck="false" oninput="updateBulletCount()"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn-outline" onclick="clearAll()">清空</button>
+      <button class="btn-detect" onclick="runDetection()">开始检测</button>
+      <button class="btn-outline" id="btnCopyReport" style="display:none" onclick="copyReport()">复制报告</button>
+    </div>
+    <div id="resultSection" class="result-section"></div>
+    <div id="highlightSection" class="highlight-section" style="display:none"></div>
+  </div>
+</div>
+
+<div id="image-check" class="page">
+  <div class="image-tool-page">
+    <h2>主图合规检测</h2>
+
+    <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+      <p>点击上传或拖拽图片到此处</p>
+      <p class="sub">支持 JPG / PNG / JPEG，单张最大 10MB，最多 20 张</p>
+      <input type="file" id="fileInput" accept=".jpg,.jpeg,.png" multiple onchange="handleFiles(this.files)">
+      <div class="progress-bar-wrap" id="progressWrap">
+        <div class="progress-bar-inner" id="progressBar"></div>
+      </div>
+    </div>
+
+    <div class="image-list" id="imageList"></div>
+
+    <div class="image-btn-row" id="imageBtnRow" style="display:none">
+      <button class="btn-outline" onclick="clearImageAll()">清空所有</button>
+      <button class="btn-detect" onclick="runImageDetection()" style="flex:2">开始检测</button>
+      <button class="btn-outline" onclick="reRunDetection()">重新检测</button>
+      <button class="btn-outline" id="btnExportReport" style="display:none" onclick="exportImageReport()">导出报告</button>
+    </div>
+
+    <div class="image-result-section" id="imageResultSection"></div>
+  </div>
+</div>
+
+<div id="profit-calc" class="page">
+  <div class="tool-page">
+    <h2>利润核算</h2>
+
+    <div class="pc-config-card">
+      <div class="form-group">
+        <div class="form-label">目标站点</div>
+        <select class="pc-select" id="pcSite" onchange="pcUpdateSite()">
+          <option value="0">美国站 (USD)</option>
+          <option value="1">英国站 (GBP)</option>
+          <option value="2">德国站 (EUR)</option>
+          <option value="3">日本站 (JPY)</option>
+          <option value="4">法国站 (EUR)</option>
+        </select>
+        <div class="pc-rate-info" id="pcRateInfo">汇率：1 USD = 7.25 CNY</div>
+      </div>
+
+      <div class="pc-row">
+        <div class="form-group">
+          <div class="form-label">
+            利润率微调
+            <span class="pc-slider-val" id="pcSliderVal">15%</span>
+          </div>
+          <div class="pc-slider-row">
+            <input type="range" class="pc-slider" id="pcMarginSlider" min="0" max="40" value="15" oninput="pcUpdateSlider()">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">站点佣金比例</div>
+          <div class="pc-input-unit">
+            <input type="number" class="pc-input" id="pcCommission" value="15" min="0" max="50" step="0.1" placeholder="15">
+            <span class="pc-unit">%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pc-section-card">
+      <h3>产品成本</h3>
+      <div class="pc-row">
+        <div class="form-group">
+          <div class="form-label">采购成本</div>
+          <div class="pc-input-unit">
+            <input type="number" class="pc-input" id="pcPurchaseCost" value="30" min="0" step="0.01" placeholder="0.00">
+            <span class="pc-unit">¥</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">包装成本</div>
+          <div class="pc-input-unit">
+            <input type="number" class="pc-input" id="pcPackagingCost" value="2" min="0" step="0.01" placeholder="0.00">
+            <span class="pc-unit">¥</span>
+          </div>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <div class="form-label">附加成本（重量/体积）</div>
+        <div class="pc-input-unit">
+          <input type="number" class="pc-input" id="pcAdditionalCost" value="0" min="0" step="0.01" placeholder="0.00">
+          <span class="pc-unit">¥</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pc-section-card">
+      <h3>物流运费</h3>
+      <div class="pc-row">
+        <div class="form-group">
+          <div class="form-label">头程运费（单件分摊）</div>
+          <div class="pc-input-unit">
+            <input type="number" class="pc-input" id="pcHeadFreight" value="8" min="0" step="0.01" placeholder="0.00">
+            <span class="pc-unit">¥</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">FBA尾程配送费</div>
+          <div class="pc-input-unit">
+            <input type="number" class="pc-input" id="pcFbaDelivery" value="3.45" min="0" step="0.01" placeholder="0.00">
+            <span class="pc-unit" id="pcFbaUnit">$</span>
+          </div>
+          <div class="pc-rate-info" style="margin-top:4px">请填写站点原生费用，系统自动按汇率换算</div>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <div class="form-label">海外仓杂费（可选）</div>
+        <div class="pc-input-unit">
+          <input type="number" class="pc-input" id="pcWarehouseFee" value="0" min="0" step="0.01" placeholder="0.00">
+          <span class="pc-unit">¥</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pc-section-card">
+      <h3>销售定价</h3>
+      <div class="pc-row">
+        <div class="form-group">
+          <div class="form-label" id="pcPriceLabel">前台售价</div>
+          <div class="pc-input-unit">
+            <input type="number" class="pc-input" id="pcSellingPrice" value="19.99" min="0" step="0.01" placeholder="0.00">
+            <span class="pc-unit" id="pcPriceUnit">$</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">折扣比例</div>
+          <div class="pc-input-unit">
+            <input type="number" class="pc-input" id="pcDiscountRate" value="0" min="0" max="100" step="0.1" placeholder="0">
+            <span class="pc-unit">%</span>
+          </div>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <div class="form-label">优惠券抵扣</div>
+        <div class="pc-input-unit">
+          <input type="number" class="pc-input" id="pcCouponAmount" value="0" min="0" step="0.01" placeholder="0.00">
+          <span class="pc-unit" id="pcCouponUnit">$</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pc-section-card">
+      <h3>平台费用</h3>
+      <div class="pc-row">
+        <div class="form-group">
+          <div class="form-label">平台佣金 <span style="font-size:11px;color:var(--text-muted)">自动计算</span></div>
+          <div class="pc-input-unit">
+            <input type="text" class="pc-input" id="pcCalcCommission" value="-" readonly style="opacity:0.6">
+            <span class="pc-unit" id="pcCommUnit">$</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">广告单次分摊（可选）</div>
+          <div class="pc-input-unit">
+            <input type="number" class="pc-input" id="pcAdvertisingCost" value="3" min="0" step="0.01" placeholder="0.00">
+            <span class="pc-unit">¥</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-outline" onclick="pcReset()">重置数据</button>
+      <button class="btn-detect" onclick="pcCalculate()">开始计算</button>
+      <button class="btn-outline" id="btnPcCopyReport" style="display:none" onclick="pcCopyReport()">复制核算报告</button>
+    </div>
+
+    <div class="pc-result-section" id="pcResultSection"></div>
+  </div>
+</div>
+
+<div id="keyword-extract" class="page">
+  <div class="tool-page">
+    <h2>竞品关键词提取</h2>
+
+    <div class="form-group">
+      <div class="form-label">
+        竞品文案粘贴
+        <span id="kwCharCount">0 字符</span>
+      </div>
+      <div class="pc-rate-info" style="margin-bottom:8px">直接粘贴竞品标题、五点描述或详情文案，即可提取关键词</div>
+      <textarea id="kwTextInput" placeholder="批量粘贴竞品标题、五点描述、产品详情文案..." spellcheck="false" oninput="kwUpdateCharCount()" style="min-height:200px"></textarea>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-outline" onclick="kwClearAll()">清空内容</button>
+      <button class="btn-detect" onclick="kwStartExtract()">开始提取</button>
+      <button class="btn-outline" id="btnKwCopyAll" style="display:none" onclick="kwCopyAll()">复制结果</button>
+    </div>
+
+    <div class="kw-result-section" id="kwResultSection"></div>
+    <div class="kw-highlight-preview" id="kwHighlightPreview" style="display:none"></div>
+  </div>
+</div>
+
+<div id="ops-tools" class="page">
+  <div class="tool-page">
+    <h2>运营辅助工具合集</h2>
+
+    <!-- 子模块1：文案格式化 -->
+    <div class="ot-section-card">
+      <h3>文案格式化工具</h3>
+      <div class="form-group">
+        <div class="form-label">粘贴原始文案</div>
+        <textarea id="otFormatInput" placeholder="粘贴带空格、换行、乱码的产品文案..." spellcheck="false" style="min-height:120px"></textarea>
+      </div>
+      <div class="btn-row" style="margin-bottom:12px">
+        <button class="btn-outline" onclick="otClearFormat()">清空</button>
+        <button class="btn-detect" onclick="otFormatText()">格式化</button>
+      </div>
+      <div class="form-group">
+        <div class="form-label">格式化结果</div>
+        <div class="ot-output-box" id="otFormatOutput"></div>
+      </div>
+      <button class="btn-outline" id="btnOtCopyFormat" style="display:none;margin-top:6px" onclick="otCopyFormatted()">复制成品文案</button>
+    </div>
+
+    <!-- 子模块2：类目匹配 -->
+    <div class="ot-section-card">
+      <h3>类目匹配工具</h3>
+      <div class="form-group">
+        <div class="form-label">核心关键词 / 属性词</div>
+        <textarea id="otCatKeywords" placeholder="输入产品关键词，多个词用空格或逗号分隔，如：wireless bluetooth headphones 降噪 运动..." spellcheck="false" style="min-height:60px"></textarea>
+      </div>
+      <div class="btn-row" style="margin-bottom:12px">
+        <button class="btn-outline" onclick="otClearCategory()">清空</button>
+        <button class="btn-detect" onclick="otMatchCategory()">匹配类目</button>
+      </div>
+      <div class="ot-cat-list" id="otCatResults"></div>
+    </div>
+
+    <!-- 子模块3：备货预估 -->
+    <div class="ot-section-card">
+      <h3>备货预估计算器</h3>
+      <div class="form-group">
+        <div class="form-label">日均销量（单）</div>
+        <input type="number" class="pc-input" id="otDailySales" value="" min="0" step="1" placeholder="例：15">
+      </div>
+      <div class="pc-row">
+        <div class="form-group">
+          <div class="form-label">备货周期（天）</div>
+          <input type="number" class="pc-input" id="otPrepDays" value="" min="1" step="1" placeholder="例：45">
+        </div>
+        <div class="form-group">
+          <div class="form-label">安全库存（天）</div>
+          <input type="number" class="pc-input" id="otSafetyDays" value="" min="1" step="1" placeholder="例：15">
+        </div>
+      </div>
+      <div class="btn-row" style="margin-bottom:12px">
+        <button class="btn-outline" onclick="otClearInventory()">清空</button>
+        <button class="btn-detect" onclick="otCalcInventory()">开始估算</button>
+      </div>
+      <div class="ot-estimate-grid" id="otInventoryResult" style="display:none"></div>
+      <div id="otInventoryRisk" style="margin-top:12px"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-backdrop" id="toastBackdrop"></div>
+<div class="copy-toast" id="copyToast"></div>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <img id="lightboxImg" src="" alt="">
+  <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text">正在检测中...</div>
+</div>
+
+<script>
+var currentPage = 'home';
+
+function showPage(id, el) {
+  document.getElementById(currentPage).classList.remove('active');
+  document.getElementById(id).classList.add('active');
+  currentPage = id;
+
+  var links = document.querySelectorAll('nav a');
+  for (var i = 0; i < links.length; i++) {
+    links[i].classList.remove('active');
+  }
+  el.classList.add('active');
+}
+
+function navigateTo(id) {
+  document.getElementById('home').classList.remove('active');
+  document.getElementById(id).classList.add('active');
+  currentPage = id;
+
+  var links = document.querySelectorAll('nav a');
+  for (var i = 0; i < links.length; i++) {
+    links[i].classList.remove('active');
+    if (links[i].getAttribute('href') === '#' + id) {
+      links[i].classList.add('active');
+    }
+  }
+}
+
+// ===== 主题切换 =====
+function toggleTheme() {
+  var body = document.body;
+  if (body.classList.contains('light')) {
+    body.classList.remove('light');
+    localStorage.setItem('theme', 'dark');
+  } else {
+    body.classList.add('light');
+    localStorage.setItem('theme', 'light');
+  }
+}
+
+(function initTheme() {
+  if (localStorage.getItem('theme') === 'light') {
+    document.body.classList.add('light');
+  }
+})();
+
+// ===== 标题五点检测 =====
+
+var prohibitedWords = [
+  { word: 'best seller',             type: 'danger', reason: '平台禁止使用的促销性宣称',   suggestion: '建议替换为"畅销款"或"热门款"' },
+  { word: '#1',                      type: 'danger', reason: '禁止使用排名类宣称',           suggestion: '建议直接删除，改为"热门款"或"高品质"' },
+  { word: 'top rated',               type: 'danger', reason: '禁止使用主观评级词',           suggestion: '建议替换为"广受好评"或直接删除' },
+  { word: 'guaranteed',              type: 'danger', reason: '禁止使用保证性词语',           suggestion: '建议替换为"品质可靠"或"耐用"' },
+  { word: '100%',                    type: 'warn',   reason: '避免绝对化表述',               suggestion: '建议替换为"高品质"或"高性价比"' },
+  { word: 'free shipping',           type: 'warn',   reason: 'FBA商品无需标注包邮信息',       suggestion: '建议直接删除，FBA商品自动显示Prime标识' },
+  { word: 'cheap',                   type: 'warn',   reason: '低价暗示词，影响品牌形象',        suggestion: '建议替换为"高性价比"或"经济实惠"' },
+  { word: 'discount',                type: 'warn',   reason: '禁止在标题中标注折扣信息',        suggestion: '建议直接删除' },
+  { word: 'on sale',                 type: 'warn',   reason: '禁止标注促销信息',             suggestion: '建议直接删除' },
+  { word: 'buy now',                 type: 'warn',   reason: '禁止使用催促性购买短语',          suggestion: '建议直接删除' },
+  { word: 'click here',              type: 'warn',   reason: '禁止使用引导点击类短语',          suggestion: '建议直接删除' },
+  { word: 'money back',              type: 'danger', reason: '禁止使用退款保证类词语',          suggestion: '建议替换为"品质可靠"或直接删除' },
+  { word: 'satisfaction guaranteed', type: 'danger', reason: '禁止使用满意度保证宣称',          suggestion: '建议替换为"品质可靠"或直接删除' },
+  { word: '100% quality',            type: 'danger', reason: '禁止绝对化质量宣称',            suggestion: '建议替换为"高品质"或"严格品控"' },
+  { word: 'best quality',            type: 'danger', reason: '禁止使用最高级质量宣称',          suggestion: '建议替换为"高品质"或"优质材料"' },
+  { word: 'amazing',                 type: 'info',   reason: '主观形容词，缺乏客观说服力',       suggestion: '建议替换为"性能出色"或"设计精良"' },
+  { word: 'excellent',               type: 'info',   reason: '主观形容词，缺乏客观说服力',       suggestion: '建议替换为"优质"或"耐用"' },
+  { word: 'perfect',                 type: 'info',   reason: '夸大性描述，可能引发差评风险',       suggestion: '建议替换为"精心设计"或"实用"' }
+];
+
+var contactPatterns = [
+  { pattern: /[\w.-]+@[\w.-]+\.\w+/,                      reason: '包含邮箱地址',  suggestion: '建议直接删除，亚马逊禁止listing中包含联系信息' },
+  { pattern: /(https?:\/\/|www\.)[^\s]*/,                  reason: '包含网址链接',  suggestion: '建议直接删除URL链接' },
+  { pattern: /(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/, reason: '包含电话号码', suggestion: '建议直接删除电话号码' }
+];
+
+var lastResults = [];
+var lastTitle = '';
+var lastBullets = '';
+
+function updateTitleCount() {
+  var len = document.getElementById('titleInput').value.length;
+  document.getElementById('titleCount').textContent = len + ' 字符';
+}
+
+function updateBulletCount() {
+  var len = document.getElementById('bulletInput').value.length;
+  document.getElementById('bulletCount').textContent = len + ' 字符';
+}
+
+function clearAll() {
+  document.getElementById('titleInput').value = '';
+  document.getElementById('bulletInput').value = '';
+  updateTitleCount();
+  updateBulletCount();
+  document.getElementById('resultSection').classList.remove('show');
+  document.getElementById('resultSection').innerHTML = '';
+  document.getElementById('highlightSection').style.display = 'none';
+  document.getElementById('highlightSection').innerHTML = '';
+  document.getElementById('btnCopyReport').style.display = 'none';
+  lastResults = [];
+  lastTitle = '';
+  lastBullets = '';
+}
+
+function runDetection() {
+  if (!useModule('title')) return;
+  var title = document.getElementById('titleInput').value.trim();
+  var bullets = document.getElementById('bulletInput').value.trim();
+  lastTitle = title;
+  lastBullets = bullets;
+  var violations = [];
+  var idx = 0;
+
+  if (title === '' && bullets === '') {
+    lastResults = [];
+    document.getElementById('resultSection').innerHTML =
+      '<div class="result-empty">请先输入标题或五点描述内容</div>';
+    document.getElementById('resultSection').classList.add('show');
+    document.getElementById('highlightSection').style.display = 'none';
+    document.getElementById('btnCopyReport').style.display = 'none';
+    return;
+  }
+
+  // 标题检测
+  if (title.length > 0) {
+    // 全大写检测
+    var words = title.split(/\s+/);
+    var upperWords = words.filter(function(w) { return w.length > 2 && w === w.toUpperCase() && /[A-Z]{3,}/.test(w); });
+    if (upperWords.length >= 3) {
+      violations.push({
+        idx: idx++,
+        word: upperWords.slice(0,3).join(', ') + ' 等',
+        source: '标题',
+        sourceType: 'title',
+        reason: '存在多个全大写单词',
+        suggestion: '建议仅首字母大写，全大写会影响可读性且不符合亚马逊规范',
+        type: 'warn'
+      });
+    }
+
+    // HTML标签检测
+    if (/<[^>]+>/.test(title)) {
+      violations.push({
+        idx: idx++,
+        word: 'HTML标签',
+        source: '标题',
+        sourceType: 'title',
+        reason: '包含HTML代码',
+        suggestion: '建议直接删除所有HTML标签，亚马逊禁止使用HTML代码',
+        type: 'danger'
+      });
+    }
+
+    // 违规词检测
+    var titleLower = title.toLowerCase();
+    for (var i = 0; i < prohibitedWords.length; i++) {
+      if (titleLower.indexOf(prohibitedWords[i].word) !== -1) {
+        violations.push({
+          idx: idx++,
+          word: prohibitedWords[i].word,
+          source: '标题',
+          sourceType: 'title',
+          reason: prohibitedWords[i].reason,
+          suggestion: prohibitedWords[i].suggestion,
+          type: prohibitedWords[i].type
+        });
+      }
+    }
+
+    // 联系方式检测
+    for (var j = 0; j < contactPatterns.length; j++) {
+      if (contactPatterns[j].pattern.test(title)) {
+        violations.push({
+          idx: idx++,
+          word: '联系方式',
+          source: '标题',
+          sourceType: 'title',
+          reason: contactPatterns[j].reason,
+          suggestion: contactPatterns[j].suggestion,
+          type: 'danger'
+        });
+      }
+    }
+  }
+
+  // 五点检测（无限条数）
+  if (bullets.length > 0) {
+    var bulletLines = bullets.split('\n').filter(function(l) { return l.trim() !== ''; });
+
+    for (var k = 0; k < bulletLines.length; k++) {
+      var bl = bulletLines[k].trim();
+
+      if (/<[^>]+>/.test(bl)) {
+        violations.push({
+          idx: idx++,
+          word: 'HTML标签',
+          source: '第' + (k + 1) + '点',
+          sourceType: 'bullet',
+          sourceLine: k,
+          reason: '包含HTML代码',
+          suggestion: '建议直接删除所有HTML标签',
+          type: 'danger'
+        });
+      }
+
+      var blLower = bl.toLowerCase();
+      for (var m = 0; m < prohibitedWords.length; m++) {
+        if (blLower.indexOf(prohibitedWords[m].word) !== -1) {
+          violations.push({
+            idx: idx++,
+            word: prohibitedWords[m].word,
+            source: '第' + (k + 1) + '点',
+            sourceType: 'bullet',
+            sourceLine: k,
+            reason: prohibitedWords[m].reason,
+            suggestion: prohibitedWords[m].suggestion,
+            type: prohibitedWords[m].type
+          });
+        }
+      }
+
+      for (var n = 0; n < contactPatterns.length; n++) {
+        if (contactPatterns[n].pattern.test(bl)) {
+          violations.push({
+            idx: idx++,
+            word: '联系方式',
+            source: '第' + (k + 1) + '点',
+            sourceType: 'bullet',
+            sourceLine: k,
+            reason: contactPatterns[n].reason,
+            suggestion: contactPatterns[n].suggestion,
+            type: 'danger'
+          });
+        }
+      }
+    }
+  }
+
+  lastResults = violations;
+  renderResults(violations, title, bullets);
+}
+
+function getWordCount(text) {
+  if (!text) return 0;
+  return text.split(/[\s\n]+/).filter(function(w) { return w.length > 0; }).length;
+}
+
+function generateHighlightedText(text, sourceType, sourceLine) {
+  if (!text) return '';
+
+  var parts = [];
+  var matched = [];
+
+  // 收集所有需要高亮的违规词
+  for (var i = 0; i < lastResults.length; i++) {
+    var r = lastResults[i];
+    if (sourceType === 'title' && r.sourceType !== 'title') continue;
+
+    if (sourceType === 'bullet') {
+      if (r.sourceType !== 'bullet') continue;
+      if (r.sourceLine !== undefined && r.sourceLine !== sourceLine) continue;
+    }
+
+    var w = r.word;
+    if (w === '联系方式' || w === 'HTML标签' || w.indexOf(' 等') > 0) continue;
+
+    matched.push({ word: w, idx: r.idx });
+  }
+
+  // 按长度降序排列，避免短词覆盖长词
+  matched.sort(function(a, b) { return b.word.length - a.word.length; });
+
+  // 构建正则替换
+  var escWords = matched.map(function(m) { return m.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); });
+  if (escWords.length === 0) return escapeHtml(text);
+
+  var regex = new RegExp('(' + escWords.join('|') + ')', 'gi');
+  var wordToIdx = {};
+  for (var j = 0; j < matched.length; j++) {
+    wordToIdx[matched[j].word.toLowerCase()] = matched[j].idx;
+  }
+
+  return escapeHtml(text).replace(regex, function(match) {
+    var idx = wordToIdx[match.toLowerCase()];
+    if (idx !== undefined) {
+      return '<span class="hl-mark" id="hl-' + idx + '">' + match + '</span>';
+    }
+    return match;
+  });
+}
+
+function renderResults(violations, title, bullets) {
+  var section = document.getElementById('resultSection');
+  var hlSection = document.getElementById('highlightSection');
+  var totalWords = getWordCount(title) + getWordCount(bullets);
+  var violationCount = violations.length;
+  var rate = totalWords > 0 ? Math.round((1 - violationCount / totalWords) * 100) : 100;
+  if (rate < 0) rate = 0;
+  if (rate > 100) rate = 100;
+
+  var rateClass = rate >= 90 ? 'rate-green' : (rate >= 70 ? 'rate-yellow' : 'rate-red');
+
+  var html = '';
+
+  // 汇总面板
+  html += '<div class="summary-panel">';
+  html += '<div class="summary-item"><div class="summary-label">检测总词数</div><div class="summary-value">' + totalWords + '</div></div>';
+  html += '<div class="summary-item"><div class="summary-label">违规词总数</div><div class="summary-value vcount">' + violationCount + '</div></div>';
+  html += '<div class="summary-item"><div class="summary-label">综合合规率</div><div class="summary-value ' + rateClass + '">' + rate + '%</div></div>';
+  html += '</div>';
+
+  // 违规词详情
+  if (violations.length === 0) {
+    html += '<div class="result-empty">未检测到违规词或明显问题，建议进一步检查关键词覆盖度与可读性</div>';
+  } else {
+    html += '<div class="detail-block">';
+    html += '<h3>违规词详情 <button class="btn-copy" onclick="copyViolations()">复制违规词列表</button></h3>';
+    html += '<table class="detail-table"><thead><tr>';
+    html += '<th>违规词</th><th>位置</th><th>违规原因</th><th>修改建议</th>';
+    html += '</tr></thead><tbody>';
+
+    for (var i = 0; i < violations.length; i++) {
+      var v = violations[i];
+      html += '<tr>';
+      html += '<td><span class="word-highlight">' + escapeHtml(v.word) + '</span></td>';
+      html += '<td><a class="source-link" onclick="scrollToViolation(' + v.idx + ')">' + escapeHtml(v.source) + '</a></td>';
+      html += '<td>' + escapeHtml(v.reason) + '</td>';
+      html += '<td>' + escapeHtml(v.suggestion) + '</td>';
+      html += '</tr>';
+    }
+
+    html += '</tbody></table></div>';
+  }
+
+  section.innerHTML = html;
+  section.classList.add('show');
+  document.getElementById('btnCopyReport').style.display = violations.length > 0 ? '' : 'none';
+
+  // 生成原文高亮预览
+  var hlHtml = '';
+
+  if (title) {
+    hlHtml += '<div class="highlight-preview">';
+    hlHtml += '<h4>标题原文高亮</h4>';
+    hlHtml += '<div class="highlight-text">' + generateHighlightedText(title, 'title', -1) + '</div>';
+    hlHtml += '</div>';
+  }
+
+  if (bullets) {
+    var bulletLines = bullets.split('\n').filter(function(l) { return l.trim() !== ''; });
+    for (var b = 0; b < bulletLines.length; b++) {
+      hlHtml += '<div class="highlight-preview">';
+      hlHtml += '<h4>第' + (b + 1) + '点原文高亮</h4>';
+      hlHtml += '<div class="highlight-text">' + generateHighlightedText(bulletLines[b], 'bullet', b) + '</div>';
+      hlHtml += '</div>';
+    }
+  }
+
+  hlSection.innerHTML = hlHtml;
+  hlSection.style.display = title || bullets ? '' : 'none';
+}
+
+function scrollToViolation(idx) {
+  var el = document.getElementById('hl-' + idx);
+  if (!el) return;
+
+  document.getElementById('highlightSection').style.display = '';
+
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  var flashCount = 0;
+  var maxFlashes = 6;
+
+  function flash() {
+    if (flashCount >= maxFlashes) {
+      el.classList.remove('flash');
+      return;
+    }
+    if (flashCount % 2 === 0) {
+      el.classList.add('flash');
+    } else {
+      el.classList.remove('flash');
+    }
+    flashCount++;
+    setTimeout(flash, 300);
+  }
+
+  flash();
+}
+
+function copyViolations() {
+  if (lastResults.length === 0) return;
+  var text = '';
+  for (var i = 0; i < lastResults.length; i++) {
+    var v = lastResults[i];
+    text += (i + 1) + '. [' + v.source + '] ' + v.word + ' — ' + v.reason + ' → ' + v.suggestion + '\n';
+  }
+  copyToClipboard(text);
+}
+
+function copyReport() {
+  var totalWords = getWordCount(lastTitle) + getWordCount(lastBullets);
+  var violationCount = lastResults.length;
+  var rate = totalWords > 0 ? Math.round((1 - violationCount / totalWords) * 100) : 100;
+  if (rate < 0) rate = 0;
+  if (rate > 100) rate = 100;
+
+  var text = '===== 亚马逊Listing检测报告 =====\n\n';
+  text += '【汇总】\n';
+  text += '检测总词数：' + totalWords + '\n';
+  text += '违规词总数：' + violationCount + '\n';
+  text += '综合合规率：' + rate + '%\n\n';
+
+  if (violationCount > 0) {
+    text += '【违规词详情】\n';
+    for (var i = 0; i < lastResults.length; i++) {
+      var v = lastResults[i];
+      text += (i + 1) + '. [' + v.source + '] ' + v.word + '\n';
+      text += '   原因：' + v.reason + '\n';
+      text += '   建议：' + v.suggestion + '\n\n';
+    }
+  } else {
+    text += '未检测到违规词。\n';
+  }
+
+  copyToClipboard(text);
+}
+
+function copyToClipboard(text) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+  showToast('已复制到剪贴板');
+}
+
+function escapeHtml(str) {
+  var div = document.createElement('div');
+  div.appendChild(document.createTextNode(str));
+  return div.innerHTML;
+}
+
+function showToast(msg) {
+  var toast = document.getElementById('copyToast');
+  var backdrop = document.getElementById('toastBackdrop');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  backdrop.classList.add('show');
+  clearTimeout(toast._timeout);
+  toast._timeout = setTimeout(function() {
+    toast.classList.remove('show');
+    backdrop.classList.remove('show');
+  }, 1800);
+}
+
+// ===== 主图合规检测 =====
+
+var MAX_IMAGES = 20;
+var MAX_SIZE = 10 * 1024 * 1024;
+var imageStore = [];
+var imageResults = [];
+
+var uploadZone = document.getElementById('uploadZone');
+
+uploadZone.addEventListener('dragover', function(e) {
+  e.preventDefault();
+  uploadZone.classList.add('drag-over');
+});
+
+uploadZone.addEventListener('dragleave', function(e) {
+  e.preventDefault();
+  uploadZone.classList.remove('drag-over');
+});
+
+uploadZone.addEventListener('drop', function(e) {
+  e.preventDefault();
+  uploadZone.classList.remove('drag-over');
+  if (e.dataTransfer.files.length > 0) {
+    handleFiles(e.dataTransfer.files);
+  }
+});
+
+function handleFiles(files) {
+  var validFiles = [];
+  var errors = [];
+
+  for (var i = 0; i < files.length; i++) {
+    var f = files[i];
+    var ext = f.name.split('.').pop().toLowerCase();
+
+    if (['jpg','jpeg','png'].indexOf(ext) === -1) {
+      errors.push('"' + f.name + '" 格式不支持');
+      continue;
+    }
+    if (f.size > MAX_SIZE) {
+      errors.push('"' + f.name + '" 超过10MB限制');
+      continue;
+    }
+
+    var isDup = false;
+    for (var j = 0; j < imageStore.length; j++) {
+      if (imageStore[j].name === f.name && imageStore[j].size === f.size) {
+        isDup = true;
+        break;
+      }
+    }
+    if (isDup) continue;
+
+    if (imageStore.length + validFiles.length >= MAX_IMAGES) {
+      errors.push('最多上传' + MAX_IMAGES + '张图片');
+      break;
+    }
+
+    validFiles.push(f);
+  }
+
+  if (errors.length > 0) {
+    showToast(errors[0]);
+    if (errors.length > 1) {
+      setTimeout(function() { showToast('共' + errors.length + '个文件未能上传'); }, 2000);
+    }
+  }
+
+  if (validFiles.length === 0) return;
+
+  var progressBar = document.getElementById('progressBar');
+  var progressWrap = document.getElementById('progressWrap');
+  progressWrap.classList.add('show');
+  progressBar.style.width = '0%';
+
+  var loaded = 0;
+  var total = validFiles.length;
+
+  function loadNext() {
+    if (loaded >= total) {
+      progressWrap.classList.remove('show');
+      renderImageList();
+      updateImageButtons();
+      document.getElementById('fileInput').value = '';
+      return;
+    }
+
+    var f = validFiles[loaded];
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      imageStore.push({
+        name: f.name,
+        size: f.size,
+        dataUrl: e.target.result,
+        file: f
+      });
+      loaded++;
+      progressBar.style.width = Math.round(loaded / total * 100) + '%';
+      loadNext();
+    };
+    reader.onerror = function() {
+      loaded++;
+      progressBar.style.width = Math.round(loaded / total * 100) + '%';
+      loadNext();
+    };
+    reader.readAsDataURL(f);
+  }
+
+  loadNext();
+}
+
+function renderImageList() {
+  var container = document.getElementById('imageList');
+  var html = '';
+  for (var i = 0; i < imageStore.length; i++) {
+    var img = imageStore[i];
+    html += '<div class="thumb-card">';
+    html += '<img class="thumb-img" src="' + img.dataUrl + '" alt="' + escapeHtml(img.name) + '" onclick="openLightbox(\'' + i + '\')">';
+    html += '<button class="thumb-delete" onclick="event.stopPropagation();deleteImage(' + i + ')">x</button>';
+    html += '<div class="thumb-info">';
+    html += '<div class="thumb-name">' + escapeHtml(img.name) + '</div>';
+    html += '<div class="thumb-size">' + formatSize(img.size) + '</div>';
+    html += '</div>';
+    html += '</div>';
+  }
+  container.innerHTML = html;
+}
+
+function deleteImage(index) {
+  imageStore.splice(index, 1);
+  imageResults = [];
+  document.getElementById('imageResultSection').classList.remove('show');
+  document.getElementById('imageResultSection').innerHTML = '';
+  document.getElementById('btnExportReport').style.display = 'none';
+  renderImageList();
+  updateImageButtons();
+}
+
+function clearImageAll() {
+  imageStore = [];
+  imageResults = [];
+  document.getElementById('imageList').innerHTML = '';
+  document.getElementById('imageResultSection').classList.remove('show');
+  document.getElementById('imageResultSection').innerHTML = '';
+  document.getElementById('btnExportReport').style.display = 'none';
+  updateImageButtons();
+  document.getElementById('fileInput').value = '';
+}
+
+function updateImageButtons() {
+  var row = document.getElementById('imageBtnRow');
+  row.style.display = imageStore.length > 0 ? 'flex' : 'none';
+}
+
+function formatSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1048576).toFixed(2) + ' MB';
+}
+
+function showLoading() {
+  document.getElementById('loadingOverlay').classList.add('show');
+}
+
+function hideLoading() {
+  document.getElementById('loadingOverlay').classList.remove('show');
+}
+
+function openLightbox(index) {
+  var lb = document.getElementById('lightbox');
+  var img = document.getElementById('lightboxImg');
+  img.src = imageStore[index].dataUrl;
+  lb.classList.add('show');
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('show');
+}
+
+function runImageDetection() {
+  if (!useModule('image')) return;
+  if (imageStore.length === 0) {
+    showToast('请先上传图片');
+    return;
+  }
+
+  showLoading();
+
+  imageResults = [];
+  var total = imageStore.length;
+  var done = 0;
+
+  function detectNext(index) {
+    if (index >= total) {
+      renderImageResults();
+      hideLoading();
+      return;
+    }
+
+    detectImageAsync(imageStore[index], index, function(result) {
+      imageResults.push(result);
+      detectNext(index + 1);
+    });
+  }
+
+  setTimeout(function() { detectNext(0); }, 100);
+}
+
+function reRunDetection() {
+  if (imageStore.length === 0) {
+    showToast('请先上传图片');
+    return;
+  }
+  runImageDetection();
+}
+
+function detectImageAsync(imgData, index, callback) {
+  var img = new Image();
+  img.onload = function() {
+    var result = buildDetectionResult(imgData, index, img.naturalWidth, img.naturalHeight);
+    callback(result);
+  };
+  img.onerror = function() {
+    var result = buildDetectionResult(imgData, index, 0, 0);
+    callback(result);
+  };
+  img.src = imgData.dataUrl;
+}
+
+function buildDetectionResult(imgData, index, width, height) {
+  var result = {
+    name: imgData.name,
+    size: imgData.size,
+    dataUrl: imgData.dataUrl,
+    index: index,
+    width: width,
+    height: height,
+    checks: [],
+    allPass: true
+  };
+
+  // 1. 格式检测
+  var ext = imgData.name.split('.').pop().toLowerCase();
+  var formatOk = (ext === 'jpg' || ext === 'jpeg' || ext === 'png');
+  var formatRecommended = (ext === 'jpg' || ext === 'jpeg');
+  result.checks.push({
+    label: '格式检测',
+    pass: formatOk,
+    detail: formatOk ? ('格式：' + ext.toUpperCase() + (formatRecommended ? '（推荐）' : '')) : '格式不支持，当前：' + ext.toUpperCase() + '，支持 JPG/PNG',
+    failMsg: '格式不支持，请使用 JPG 或 PNG 格式',
+    fixMsg: '建议转换为 JPG 格式上传'
+  });
+
+  // 2. 比例检测
+  var ratio = width && height ? width / height : 0;
+  var ratioOk = width && height ? Math.abs(ratio - 1) <= 0.02 : false;
+  result.checks.push({
+    label: '比例检测',
+    pass: ratioOk,
+    detail: ratioOk ? ('比例 ' + ratio.toFixed(3) + ' : 1（正方形√）') : (width && height ? ('比例 ' + ratio.toFixed(3) + ' : 1，应为 1:1 正方形') : '无法读取图片尺寸'),
+    failMsg: width && height ? ('宽高比 ' + ratio.toFixed(3) + '，非1:1正方形') : '无法读取图片尺寸',
+    fixMsg: '建议裁剪为1:1正方形比例'
+  });
+
+  // 3. 分辨率检测
+  var resOk = width >= 1000 && height >= 1000;
+  result.checks.push({
+    label: '分辨率检测',
+    pass: resOk,
+    detail: resOk ? ('分辨率 ' + width + ' x ' + height + 'px（达标√）') : (width && height ? ('分辨率 ' + width + ' x ' + height + 'px，需 ≥1000 x 1000px') : '无法读取分辨率'),
+    failMsg: width && height ? ('分辨率不足，当前 ' + width + ' x ' + height + 'px') : '无法读取分辨率',
+    fixMsg: '建议使用 ≥1600 x 1600px 的图片（推荐1600×1600）'
+  });
+
+  // 4. 文件大小检测
+  var sizeOk = imgData.size >= 102400 && imgData.size <= MAX_SIZE;
+  result.checks.push({
+    label: '文件大小检测',
+    pass: sizeOk,
+    detail: sizeOk ? ('文件大小 ' + formatSize(imgData.size) + '（达标√）') : '文件大小 ' + formatSize(imgData.size) + (imgData.size < 102400 ? '，小于100KB' : '，超过10MB'),
+    failMsg: '文件大小 ' + formatSize(imgData.size) + (imgData.size < 102400 ? '，小于100KB下限' : '，超过10MB上限'),
+    fixMsg: '建议文件大小在 1-5MB 之间'
+  });
+
+  result.checks.forEach(function(c) {
+    if (!c.pass) result.allPass = false;
+  });
+
+  return result;
+}
+
+function renderImageResults() {
+  var section = document.getElementById('imageResultSection');
+  var totalCount = imageResults.length;
+  var passCount = 0;
+  for (var i = 0; i < imageResults.length; i++) {
+    if (imageResults[i].allPass) passCount++;
+  }
+  var failCount = totalCount - passCount;
+  var rate = totalCount > 0 ? Math.round(passCount / totalCount * 100) : 100;
+  var rateClass = rate >= 90 ? 'rate-green' : (rate >= 60 ? 'rate-yellow' : 'rate-red');
+
+  var html = '';
+
+  html += '<div class="summary-panel" style="grid-template-columns:repeat(4,1fr)">';
+  html += '<div class="summary-item"><div class="summary-label">检测图片总数</div><div class="summary-value">' + totalCount + '</div></div>';
+  html += '<div class="summary-item"><div class="summary-label">合规图片数</div><div class="summary-value rate-green">' + passCount + '</div></div>';
+  html += '<div class="summary-item"><div class="summary-label">不合规图片数</div><div class="summary-value vcount">' + failCount + '</div></div>';
+  html += '<div class="summary-item"><div class="summary-label">整体合规率</div><div class="summary-value ' + rateClass + '">' + rate + '%</div></div>';
+  html += '</div>';
+
+  if (imageResults.length === 0) {
+    html += '<div class="result-empty">暂无检测结果</div>';
+  } else {
+    for (var i = 0; i < imageResults.length; i++) {
+      var r = imageResults[i];
+      var cardClass = r.allPass ? '' : ' style="border-color: var(--danger)"';
+
+      html += '<div class="image-card"' + cardClass + '>';
+      html += '<div class="image-card-inner">';
+      html += '<div class="image-card-preview" onclick="openLightbox(' + r.index + ')">';
+      html += '<img src="' + r.dataUrl + '" alt="' + escapeHtml(r.name) + '">';
+      html += '</div>';
+      html += '<div class="image-card-details">';
+      html += '<div class="image-card-name">' + escapeHtml(r.name) + '</div>';
+      html += '<div class="image-card-size">' + formatSize(r.size) + ' | ' + r.width + ' x ' + r.height + 'px</div>';
+
+      for (var j = 0; j < r.checks.length; j++) {
+        var c = r.checks[j];
+        if (c.pass) {
+          html += '<div class="check-item"><span class="check-icon check-pass">OK</span><span class="check-text-pass">' + c.detail + '</span></div>';
+        } else {
+          html += '<div class="check-item"><span class="check-icon check-fail">NO</span><span class="check-text-fail">' + c.failMsg + '</span></div>';
+        }
+      }
+
+      html += '</div></div>';
+
+      if (!r.allPass) {
+        html += '<div class="fix-suggestion">整改建议：';
+        var fixes = [];
+        for (var k = 0; k < r.checks.length; k++) {
+          if (!r.checks[k].pass) {
+            fixes.push(r.checks[k].fixMsg);
+          }
+        }
+        html += fixes.join('；') + '</div>';
+      }
+
+      html += '</div>';
+    }
+  }
+
+  section.innerHTML = html;
+  section.classList.add('show');
+  document.getElementById('btnExportReport').style.display = imageResults.length > 0 ? '' : 'none';
+}
+
+function exportImageReport() {
+  if (imageResults.length === 0) return;
+
+  var totalCount = imageResults.length;
+  var passCount = 0;
+  for (var i = 0; i < imageResults.length; i++) {
+    if (imageResults[i].allPass) passCount++;
+  }
+  var failCount = totalCount - passCount;
+  var rate = totalCount > 0 ? Math.round(passCount / totalCount * 100) : 100;
+
+  var text = '===== 亚马逊主图合规检测报告 =====\n\n';
+  text += '【汇总】\n';
+  text += '检测图片总数：' + totalCount + '\n';
+  text += '合规图片数：' + passCount + '\n';
+  text += '不合规图片数：' + failCount + '\n';
+  text += '整体合规率：' + rate + '%\n\n';
+
+  text += '【详细检测结果】\n';
+  for (var i = 0; i < imageResults.length; i++) {
+    var r = imageResults[i];
+    text += '\n--- ' + (i + 1) + '. ' + r.name + ' ---\n';
+    text += '分辨率：' + r.width + ' x ' + r.height + 'px\n';
+    text += '文件大小：' + formatSize(r.size) + '\n';
+    text += '总体结果：' + (r.allPass ? '合规' : '不合规') + '\n';
+
+    for (var j = 0; j < r.checks.length; j++) {
+      var c = r.checks[j];
+      text += '  [' + (c.pass ? 'OK' : 'NO') + '] ' + c.label + '：' + (c.pass ? c.detail : c.failMsg) + '\n';
+    }
+  }
+
+  copyToClipboard(text);
+}
+
+// ===== 竞品关键词提取 =====
+
+var kwLastText = '';
+var kwLastKeywords = {};
+
+var kwStopWords = [
+  '的','了','在','是','我','有','和','就','不','人','都','一','一个','上','也','很','到','说','要','去','你','会','着','没有','看','好','自己',
+  '这','他','她','它','们','那','些','什么','怎么','如何','为什么','因为','所以','但是','可以','这个','那个',
+  '如果','虽然','已经','而且','或者','不过','还是','只是','就是','的话','而已','一样','这么','那么','这样','那样',
+  '与','及','之','为','以','从','被','把','对','向','让','给','请','用','比','较','更','最','很','太','也','都','只','才','就','便',
+  '又','再','还','仍','已','将','要','能','会','可','应该','需要','必须','一定','可能','大概','也许',
+  '每','各','全','所','本','该','此','其','某','另','几','哪','怎','多少','来','去','做','让','使','通过','具有','提供','包括','拥有',
+  'the','a','an','is','are','was','were','be','been','being','have','has','had','do','does','did',
+  'will','would','shall','should','may','might','must','can','could','it','its','and','or','but',
+  'for','with','in','on','at','to','of','by','from','this','that','these','those','not','no','so',
+  'if','then','than','too','very','just','now','also','only','still','such','about','up','out',
+  'all','both','each','every','own','same','most','more','some','any','into','over','after','before',
+  'between','through','during','above','below','here','there','which','who','whom','when','where',
+  'why','how','much','many','other','well','back','down','off','because','since','as','use','using',
+  'our','your','my','their','made','product','item','quality','brand','shop','store','buy','purchase',
+  'shopping','customer','seller','order','review','rating','price','sale','deal','amazon','get','got',
+  'amazing','excellent','perfect','great','good','best','nice','wonderful','fantastic','incredible'
+];
+
+var kwProhibitedPatterns = [
+  'best seller','bestseller','#1','top rated','toprated','guaranteed','free shipping',
+  'freeshipping','cheap','discount','on sale','onsale','buy now','buynow','click here',
+  'clickhere','money back','moneyback','satisfaction guaranteed','satisfactionguaranteed',
+  '100% quality','100%quality','best quality','bestquality'
+];
+
+var kwAttrPatterns = [
+  'leather','cotton','metal','wood','plastic','silicone','rubber','stainless','steel','glass',
+  'ceramic','bamboo','fabric','nylon','polyester','aluminum','alloy','copper','brass','iron',
+  '皮革','棉','金属','木','塑料','硅胶','橡胶','不锈钢','玻璃','陶瓷','竹','织物','尼龙',
+  '涤纶','铝','合金','铜','铁','真皮','ABS','PC','TPE','TPU','锌合金',
+  'large','medium','small','mini','compact','portable','foldable','lightweight','heavy',
+  '大号','小号','中号','便携','折叠','轻便','迷你','超薄','加厚','加长','加大',
+  'black','white','red','blue','green','yellow','pink','purple','silver','gold','gray','brown',
+  '黑色','白色','红色','蓝色','绿色','黄色','粉色','紫色','银色','金色','灰色','棕色',
+  'ergonomic','waterproof','dustproof','shockproof','scratch-resistant','wear-resistant',
+  '人体工学','防水','防尘','防震','防刮','耐磨','防滑','静音','抗菌','环保'
+];
+
+var kwScenarioPatterns = [
+  'outdoor','indoor','office','home','travel','camping','hiking','kitchen','bathroom',
+  'bedroom','living room','garden','car','sports','fitness','yoga','running','party',
+  '户外','室内','办公','家用','旅行','露营','徒步','厨房','浴室','卧室','客厅','花园',
+  '车载','运动','健身','瑜伽','跑步','聚会','派对','野餐',
+  'multifunctional','multi-function','adjustable','rechargeable','detachable','washable',
+  '多功能','可调节','可充电','可拆卸','可清洗','可折叠','两用','三合一','多用途',
+  'for men','for women','for kids','for baby','professional','beginner','adults','children',
+  '男士','女士','儿童','婴儿','专业','入门','成人','通用','全家','老人','年轻人'
+];
+
+function kwUpdateCharCount() {
+  var len = document.getElementById('kwTextInput').value.length;
+  document.getElementById('kwCharCount').textContent = len + ' 字符';
+}
+
+function kwClearAll() {
+  document.getElementById('kwTextInput').value = '';
+  document.getElementById('kwCharCount').textContent = '0 字符';
+  document.getElementById('kwResultSection').classList.remove('show');
+  document.getElementById('kwResultSection').innerHTML = '';
+  document.getElementById('kwHighlightPreview').style.display = 'none';
+  document.getElementById('kwHighlightPreview').innerHTML = '';
+  document.getElementById('btnKwCopyAll').style.display = 'none';
+  kwLastText = '';
+  kwLastKeywords = {};
+}
+
+function kwIsStopWord(word) {
+  var w = word.toLowerCase().trim();
+  if (w.length < 2) return true;
+  return kwStopWords.indexOf(w) !== -1;
+}
+
+function kwIsProhibited(word) {
+  var w = word.toLowerCase().trim();
+  for (var i = 0; i < kwProhibitedPatterns.length; i++) {
+    if (w.indexOf(kwProhibitedPatterns[i]) !== -1) return true;
+    if (kwProhibitedPatterns[i].indexOf(w) !== -1 && w.length >= 4) return true;
+  }
+  return false;
+}
+
+function kwMatchesPatterns(word, patterns) {
+  var w = word.toLowerCase().trim();
+  for (var i = 0; i < patterns.length; i++) {
+    if (w.indexOf(patterns[i].toLowerCase()) !== -1) return true;
+  }
+  return false;
+}
+
+function kwTokenize(text) {
+  var normalized = text.replace(/[,.:;!?、，。：；！？\n\r\t"'()（）【】\[\]{}<>\/\\\-–—*&^%$#@!~`|+=]/g, ' ');
+  var rawTokens = normalized.split(/\s+/).filter(function(t) { return t.length > 0; });
+  var tokens = [];
+
+  for (var i = 0; i < rawTokens.length; i++) {
+    var token = rawTokens[i].trim();
+    if (token.length < 2) continue;
+
+    tokens.push({ word: token, isBigram: false });
+
+    if (/[\u4e00-\u9fff]/.test(token)) {
+      var chars = token.replace(/[^\u4e00-\u9fff]/g, '');
+      if (chars.length >= 2) {
+        for (var j = 0; j <= chars.length - 2; j++) {
+          tokens.push({ word: chars.substring(j, j + 2), isBigram: true });
+        }
+      }
+      if (chars.length >= 3) {
+        for (var k = 0; k <= chars.length - 3; k++) {
+          tokens.push({ word: chars.substring(k, k + 3), isBigram: true });
+        }
+      }
+    }
+  }
+
+  return tokens;
+}
+
+function kwExtractSellingPoints(text) {
+  var points = { material: [], func: [], scenario: [], audience: [] };
+  var materialTerms = ['材质','材料','material','made of','made from','fabric','leather','cotton','metal','plastic','wood','silicone','rubber','steel','aluminum','alloy','glass','ceramic','bamboo','nylon','polyester','表面','表层','外壳','机身'];
+  var functionTerms = ['功能','function','feature','用途','use','purpose','capable','ability','支持','适用','配备','搭载','内置','集成','兼容','具备','提供','design','设计','equipped','built-in','integrated'];
+  var scenarioTerms = ['场景','scenario','occasion','适合','用途','场合','用于','应用于','适用于','使用于','可在','场景'];
+  var audienceTerms = ['适用人群','target','audience','for men','for women','for kids','for baby','男士','女士','儿童','婴儿','adults','children','men','women','boy','girl','适合人群','使用者'];
+
+  var sentences = text.split(/[.。!！?？\n]+/);
+
+  for (var i = 0; i < sentences.length; i++) {
+    var s = sentences[i].trim();
+    if (s.length < 4 || s.length > 120) continue;
+
+    for (var j = 0; j < materialTerms.length; j++) {
+      if (s.toLowerCase().indexOf(materialTerms[j].toLowerCase()) !== -1) {
+        if (points.material.indexOf(s) === -1) { points.material.push(s); }
+        break;
+      }
+    }
+
+    for (var k = 0; k < functionTerms.length; k++) {
+      if (s.toLowerCase().indexOf(functionTerms[k].toLowerCase()) !== -1) {
+        if (points.func.indexOf(s) === -1) { points.func.push(s); }
+        break;
+      }
+    }
+
+    for (var l = 0; l < scenarioTerms.length; l++) {
+      if (s.toLowerCase().indexOf(scenarioTerms[l].toLowerCase()) !== -1) {
+        if (points.scenario.indexOf(s) === -1) { points.scenario.push(s); }
+        break;
+      }
+    }
+
+    for (var m = 0; m < audienceTerms.length; m++) {
+      if (s.toLowerCase().indexOf(audienceTerms[m].toLowerCase()) !== -1) {
+        if (points.audience.indexOf(s) === -1) { points.audience.push(s); }
+        break;
+      }
+    }
+  }
+
+  return points;
+}
+
+function kwStartExtract() {
+  if (!useModule('keyword')) return;
+  var text = document.getElementById('kwTextInput').value.trim();
+
+  if (!text) {
+    showToast('请先粘贴竞品文案内容');
+    return;
+  }
+
+  showLoading();
+
+  setTimeout(function() {
+    kwLastText = text;
+
+    var tokens = kwTokenize(text);
+
+    var freqMap = {};
+    for (var i = 0; i < tokens.length; i++) {
+      var w = tokens[i].word;
+      if (kwIsStopWord(w)) continue;
+
+      var key = w.toLowerCase();
+      if (!freqMap[key]) {
+        freqMap[key] = { word: w, count: 0, isBigram: tokens[i].isBigram };
+      }
+      freqMap[key].count++;
+    }
+
+    var freqList = [];
+    for (var k in freqMap) {
+      if (freqMap.hasOwnProperty(k) && freqMap[k].count >= 1) {
+        freqList.push(freqMap[k]);
+      }
+    }
+    freqList.sort(function(a, b) { return b.count - a.count; });
+
+    var anomalyList = [];
+    var cleanList = [];
+    for (var n = 0; n < freqList.length; n++) {
+      if (kwIsProhibited(freqList[n].word)) {
+        anomalyList.push(freqList[n]);
+      } else {
+        cleanList.push(freqList[n]);
+      }
+    }
+
+    var coreWords = [];
+    var longTailWords = [];
+    var attrWords = [];
+    var scenarioWords = [];
+
+    for (var c = 0; c < cleanList.length; c++) {
+      var item = cleanList[c];
+      var wordLen = item.word.length;
+      var isAttr = kwMatchesPatterns(item.word, kwAttrPatterns);
+      var isScenario = kwMatchesPatterns(item.word, kwScenarioPatterns);
+
+      if (isAttr) {
+        attrWords.push(item);
+      } else if (isScenario) {
+        scenarioWords.push(item);
+      } else if (wordLen <= 14 && item.count >= 2) {
+        coreWords.push(item);
+      } else {
+        longTailWords.push(item);
+      }
+    }
+
+    // Catch uncategorized items
+    for (var u = 0; u < cleanList.length; u++) {
+      var it = cleanList[u];
+      var inAny = false;
+      for (var g = 0; g < coreWords.length; g++) { if (coreWords[g].word === it.word) { inAny = true; break; } }
+      if (inAny) continue;
+      for (var h = 0; h < longTailWords.length; h++) { if (longTailWords[h].word === it.word) { inAny = true; break; } }
+      if (inAny) continue;
+      for (var p = 0; p < attrWords.length; p++) { if (attrWords[p].word === it.word) { inAny = true; break; } }
+      if (inAny) continue;
+      for (var q = 0; q < scenarioWords.length; q++) { if (scenarioWords[q].word === it.word) { inAny = true; break; } }
+      if (inAny) continue;
+      longTailWords.push(it);
+    }
+
+    var sellingPoints = kwExtractSellingPoints(text);
+
+    kwLastKeywords = {
+      total: cleanList.length,
+      core: coreWords,
+      longTail: longTailWords,
+      attr: attrWords,
+      scenario: scenarioWords,
+      sellingPoints: sellingPoints,
+      freqList: cleanList,
+      anomalies: anomalyList
+    };
+
+    kwRenderResults();
+    hideLoading();
+  }, 150);
+}
+
+function kwRenderKWTag(wordObj) {
+  var w = wordObj;
+  var escapedWord = kwEscapeAttr(w.word);
+  return '<span class="kw-tag" onclick="kwLocateWord(\'' + escapedWord + '\',this)" title="点击定位原文">' +
+    escapeHtml(w.word) +
+    '<span class="kw-freq">' + w.count + '</span>' +
+    '<button class="kw-copy-btn" onclick="event.stopPropagation();kwCopyWord(\'' + escapedWord + '\')">+</button>' +
+    '</span>';
+}
+
+function kwRenderResults() {
+  var section = document.getElementById('kwResultSection');
+  var kws = kwLastKeywords;
+
+  var html = '';
+
+  var coreHighFreq = 0;
+  for (var i = 0; i < kws.core.length; i++) { if (kws.core[i].count >= 3) coreHighFreq++; }
+
+  var sellingDims = 0;
+  if (kws.sellingPoints.material.length > 0) sellingDims++;
+  if (kws.sellingPoints.func.length > 0) sellingDims++;
+  if (kws.sellingPoints.scenario.length > 0) sellingDims++;
+  if (kws.sellingPoints.audience.length > 0) sellingDims++;
+
+  html += '<div class="summary-panel">';
+  html += '<div class="summary-item"><div class="summary-label">总提取词汇量</div><div class="summary-value">' + kws.total + '</div></div>';
+  html += '<div class="summary-item"><div class="summary-label">高频核心词</div><div class="summary-value">' + coreHighFreq + '</div></div>';
+  html += '<div class="summary-item"><div class="summary-label">有效卖点维度</div><div class="summary-value' + (sellingDims === 0 ? ' vcount' : '') + '">' + sellingDims + '</div></div>';
+  html += '</div>';
+
+  if (kws.anomalies.length > 0) {
+    html += '<div class="kw-anomaly-tip">';
+    html += '检测到 ' + kws.anomalies.length + ' 个可能违规的营销词汇（';
+    var anomalyWords = [];
+    for (var a = 0; a < Math.min(kws.anomalies.length, 8); a++) { anomalyWords.push(kws.anomalies[a].word); }
+    html += anomalyWords.join('、');
+    if (kws.anomalies.length > 8) html += ' 等';
+    html += '），已自动筛除</div>';
+  }
+
+  if (kws.core.length > 0) {
+    html += '<div class="kw-category-block">';
+    html += '<h3>核心大词 <button class="btn-copy" onclick="kwCopyCategory(\'core\')">复制</button></h3>';
+    html += '<div class="kw-tags">';
+    for (var c = 0; c < Math.min(kws.core.length, 30); c++) {
+      html += kwRenderKWTag(kws.core[c]);
+    }
+    html += '</div></div>';
+  }
+
+  if (kws.longTail.length > 0) {
+    html += '<div class="kw-category-block">';
+    html += '<h3>精准长尾词 <button class="btn-copy" onclick="kwCopyCategory(\'longTail\')">复制</button></h3>';
+    html += '<div class="kw-tags">';
+    for (var l = 0; l < Math.min(kws.longTail.length, 30); l++) {
+      html += kwRenderKWTag(kws.longTail[l]);
+    }
+    html += '</div></div>';
+  }
+
+  if (kws.attr.length > 0) {
+    html += '<div class="kw-category-block">';
+    html += '<h3>产品属性词 <button class="btn-copy" onclick="kwCopyCategory(\'attr\')">复制</button></h3>';
+    html += '<div class="kw-tags">';
+    for (var p = 0; p < Math.min(kws.attr.length, 30); p++) {
+      html += kwRenderKWTag(kws.attr[p]);
+    }
+    html += '</div></div>';
+  }
+
+  if (kws.scenario.length > 0) {
+    html += '<div class="kw-category-block">';
+    html += '<h3>场景卖点词 <button class="btn-copy" onclick="kwCopyCategory(\'scenario\')">复制</button></h3>';
+    html += '<div class="kw-tags">';
+    for (var s = 0; s < Math.min(kws.scenario.length, 30); s++) {
+      html += kwRenderKWTag(kws.scenario[s]);
+    }
+    html += '</div></div>';
+  }
+
+  var sp = kws.sellingPoints;
+  var hasSP = sp.material.length > 0 || sp.func.length > 0 || sp.scenario.length > 0 || sp.audience.length > 0;
+
+  if (hasSP) {
+    html += '<div class="kw-selling-block">';
+    html += '<h3>产品卖点梳理</h3>';
+    html += '<div class="kw-selling-grid">';
+
+    if (sp.material.length > 0) {
+      html += '<div class="kw-selling-item"><div class="kw-selling-label">材质 / 材料</div><div class="kw-selling-text">' + escapeHtml(sp.material.slice(0, 2).join('；')) + '</div></div>';
+    }
+    if (sp.func.length > 0) {
+      html += '<div class="kw-selling-item"><div class="kw-selling-label">功能 / 特性</div><div class="kw-selling-text">' + escapeHtml(sp.func.slice(0, 2).join('；')) + '</div></div>';
+    }
+    if (sp.scenario.length > 0) {
+      html += '<div class="kw-selling-item"><div class="kw-selling-label">使用场景</div><div class="kw-selling-text">' + escapeHtml(sp.scenario.slice(0, 2).join('；')) + '</div></div>';
+    }
+    if (sp.audience.length > 0) {
+      html += '<div class="kw-selling-item"><div class="kw-selling-label">适配人群</div><div class="kw-selling-text">' + escapeHtml(sp.audience.slice(0, 2).join('；')) + '</div></div>';
+    }
+
+    html += '</div></div>';
+  }
+
+  if (!hasSP && kws.total === 0) {
+    html += '<div class="kw-empty-hint">未提取到有效关键词，请检查文案内容</div>';
+  }
+
+  section.innerHTML = html;
+  section.classList.add('show');
+  document.getElementById('btnKwCopyAll').style.display = kws.total > 0 ? '' : 'none';
+
+  kwRenderHighlight(kws.freqList.slice(0, 25), kwLastText);
+}
+
+function kwEscapeAttr(str) {
+  return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function kwCopyWord(word) {
+  copyToClipboard(word);
+}
+
+function kwCopyCategory(cat) {
+  var words = kwLastKeywords[cat] || [];
+  if (words.length === 0) return;
+
+  var text = words.map(function(w) { return w.word; }).join(', ');
+  copyToClipboard(text);
+}
+
+function kwCopyAll() {
+  var all = kwLastKeywords.freqList || [];
+  if (all.length === 0) return;
+
+  var text = '===== 竞品关键词提取结果 =====\n\n';
+
+  var cats = [
+    { name: '核心大词', key: 'core' },
+    { name: '精准长尾词', key: 'longTail' },
+    { name: '产品属性词', key: 'attr' },
+    { name: '场景卖点词', key: 'scenario' }
+  ];
+
+  for (var i = 0; i < cats.length; i++) {
+    var words = kwLastKeywords[cats[i].key];
+    if (words && words.length > 0) {
+      text += '【' + cats[i].name + '】\n';
+      text += words.map(function(w) { return w.word + '(' + w.count + ')'; }).join('、');
+      text += '\n\n';
+    }
+  }
+
+  if (kwLastKeywords.anomalies && kwLastKeywords.anomalies.length > 0) {
+    text += '【已筛除违规词】\n';
+    text += kwLastKeywords.anomalies.map(function(w) { return w.word; }).join('、');
+    text += '\n';
+  }
+
+  copyToClipboard(text);
+}
+
+function kwLocateWord(word, el) {
+  var allTags = document.querySelectorAll('.kw-tag');
+  for (var i = 0; i < allTags.length; i++) {
+    allTags[i].classList.remove('kw-flash');
+  }
+
+  kwRenderHighlight([{ word: word, count: 1 }], kwLastText, true);
+
+  if (el) {
+    var flashCount = 0;
+    var maxFlashes = 6;
+
+    function flash() {
+      if (flashCount >= maxFlashes) {
+        el.classList.remove('kw-flash');
+        return;
+      }
+      if (flashCount % 2 === 0) {
+        el.classList.add('kw-flash');
+      } else {
+        el.classList.remove('kw-flash');
+      }
+      flashCount++;
+      setTimeout(flash, 300);
+    }
+
+    flash();
+  }
+}
+
+function kwRenderHighlight(words, originalText, scrollTo) {
+  var container = document.getElementById('kwHighlightPreview');
+
+  if (!originalText) {
+    container.style.display = 'none';
+    container.innerHTML = '';
+    return;
+  }
+
+  if (!words || words.length === 0) {
+    var fullHtml = '<h4>原文预览</h4>';
+    fullHtml += '<div class="kw-highlight-text">' + escapeHtml(originalText) + '</div>';
+    container.innerHTML = fullHtml;
+    container.style.display = '';
+    return;
+  }
+
+  var escWords = [];
+  for (var i = 0; i < words.length; i++) {
+    var w = words[i].word;
+    if (w && w.length >= 2) {
+      var esc = w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      escWords.push(esc);
+    }
+  }
+
+  escWords = escWords.filter(function(v, i, a) { return a.indexOf(v) === i; });
+  escWords.sort(function(a, b) { return b.length - a.length; });
+
+  var highlighted = escapeHtml(originalText);
+
+  if (escWords.length > 0) {
+    var regex = new RegExp('(' + escWords.join('|') + ')', 'gi');
+    highlighted = highlighted.replace(regex, function(match) {
+      return '<span class="kw-hl-mark">' + match + '</span>';
+    });
+  }
+
+  var html = '<h4>原文定位预览</h4>';
+  html += '<div class="kw-highlight-text" id="kwHighlightText">' + highlighted + '</div>';
+
+  container.innerHTML = html;
+  container.style.display = '';
+
+  if (scrollTo) {
+    setTimeout(function() {
+      var el = document.getElementById('kwHighlightText');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      var marks = document.querySelectorAll('.kw-hl-mark');
+      for (var m = 0; m < marks.length; m++) {
+        marks[m].classList.add('kw-hl-flash');
+        (function(idx) {
+          setTimeout(function() {
+            if (marks[idx]) marks[idx].classList.remove('kw-hl-flash');
+          }, 1800);
+        })(m);
+      }
+    }, 120);
+  }
+}
+
+// ===== 利润核算 =====
+
+var pcFallbackRates    = [7.25, 9.15, 7.85, 0.048, 7.85];
+var pcCurrencySymbols  = ['$', '£', '€', '¥', '€'];
+var pcCurrencyNames    = ['USD', 'GBP', 'EUR', 'JPY', 'EUR'];
+var pcSiteNames        = ['美国站', '英国站', '德国站', '日本站', '法国站'];
+var pcDefaultCommissions = [15, 15, 15, 15, 15];
+var pcFbaDefaults      = [3.45, 2.80, 3.30, 370, 3.30];
+var pcLastResult = null;
+var pcLiveRates = null;
+
+function pcGetRate(idx) {
+  if (pcLiveRates && pcLiveRates.length === 5 && pcLiveRates[idx] > 0) return pcLiveRates[idx];
+  return pcFallbackRates[idx];
+}
+
+function pcLoadCachedRates() {
+  try {
+    var cached = JSON.parse(localStorage.getItem('pc_rates'));
+    if (cached && cached.rates && Array.isArray(cached.rates) && cached.rates.length === 5) {
+      var age = Date.now() - (cached.ts || 0);
+      if (age < 86400000) { pcLiveRates = cached.rates; return; }
+    }
+  } catch(e) {}
+}
+
+function pcFetchRates(callback) {
+  try {
+    fetch('https://api.exchangerate-api.com/v4/latest/USD')
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        if (data && data.rates && data.rates.CNY) {
+          var usdCny = data.rates.CNY;
+          var gbpCny = usdCny / (data.rates.GBP || 0.79);
+          var eurCny = usdCny / (data.rates.EUR || 0.92);
+          var jpyCny = usdCny / (data.rates.JPY || 150);
+          pcLiveRates = [usdCny, gbpCny, eurCny, jpyCny, eurCny];
+          try { localStorage.setItem('pc_rates', JSON.stringify({ ts: Date.now(), rates: pcLiveRates })); } catch(e) {}
+        }
+        if (callback) callback();
+      })
+      .catch(function() { if (callback) callback(); });
+  } catch(e) { if (callback) callback(); }
+}
+
+function pcInit() {
+  var savedSite = localStorage.getItem('pc_site');
+  if (savedSite !== null) { document.getElementById('pcSite').value = savedSite; }
+
+  var savedComm = localStorage.getItem('pc_commission');
+  if (savedComm !== null) { document.getElementById('pcCommission').value = savedComm; }
+
+  var savedMargin = localStorage.getItem('pc_margin');
+  if (savedMargin !== null) {
+    document.getElementById('pcMarginSlider').value = savedMargin;
+    document.getElementById('pcSliderVal').textContent = savedMargin + '%';
+  }
+
+  pcLoadCachedRates();
+  pcUpdateSite();
+  pcFetchRates(function() { pcUpdateSite(); });
+}
+
+function pcUpdateSite() {
+  var idx = parseInt(document.getElementById('pcSite').value) || 0;
+  var rate = pcGetRate(idx);
+  var name = pcCurrencyNames[idx];
+  var sym  = pcCurrencySymbols[idx];
+
+  if (idx === 3) {
+    document.getElementById('pcRateInfo').textContent = '汇率：100 JPY ≈ ' + (rate * 100).toFixed(2) + ' CNY';
+  } else {
+    document.getElementById('pcRateInfo').textContent = '汇率：1 ' + name + ' = ' + rate.toFixed(2) + ' CNY';
+  }
+
+  document.getElementById('pcPriceUnit').textContent = sym;
+  document.getElementById('pcCouponUnit').textContent = sym;
+  document.getElementById('pcFbaUnit').textContent = sym;
+  document.getElementById('pcPriceLabel').textContent = '前台售价（' + sym + '）';
+
+  var commEl = document.getElementById('pcCommUnit');
+  if (commEl) commEl.textContent = sym;
+
+  var savedComm = localStorage.getItem('pc_commission');
+  if (savedComm === null) {
+    document.getElementById('pcCommission').value = pcDefaultCommissions[idx];
+  }
+
+  localStorage.setItem('pc_site', idx);
+  pcUpdateCommissionDisplay();
+}
+
+function pcUpdateSlider() {
+  var val = document.getElementById('pcMarginSlider').value;
+  document.getElementById('pcSliderVal').textContent = val + '%';
+  localStorage.setItem('pc_margin', val);
+}
+
+function pcUpdateCommissionDisplay() {
+  var idx = parseInt(document.getElementById('pcSite').value) || 0;
+  var rate = pcGetRate(idx);
+  var sellingPrice = parseFloat(document.getElementById('pcSellingPrice').value) || 0;
+  var commissionRate = parseFloat(document.getElementById('pcCommission').value) || 0;
+  var discountRate = parseFloat(document.getElementById('pcDiscountRate').value) || 0;
+
+  var effectivePrice = sellingPrice * rate * (1 - discountRate / 100);
+  var commission = effectivePrice * commissionRate / 100;
+
+  if (sellingPrice > 0 && commissionRate > 0) {
+    document.getElementById('pcCalcCommission').value = rate > 0 ? (commission / rate).toFixed(2) : '-';
+  } else {
+    document.getElementById('pcCalcCommission').value = '-';
+  }
+
+  localStorage.setItem('pc_commission', commissionRate);
+}
+
+var pcCommissionInput = document.getElementById('pcCommission');
+if (pcCommissionInput) {
+  pcCommissionInput.addEventListener('input', pcUpdateCommissionDisplay);
+}
+
+var pcPriceInput = document.getElementById('pcSellingPrice');
+if (pcPriceInput) {
+  pcPriceInput.addEventListener('input', pcUpdateCommissionDisplay);
+}
+
+var pcDiscountInput = document.getElementById('pcDiscountRate');
+if (pcDiscountInput) {
+  pcDiscountInput.addEventListener('input', pcUpdateCommissionDisplay);
+}
+
+function pcGetVal(id) {
+  var v = parseFloat(document.getElementById(id).value);
+  return isNaN(v) ? 0 : v;
+}
+
+function pcCalculate() {
+  if (!useModule('profit')) return;
+  var idx          = parseInt(document.getElementById('pcSite').value) || 0;
+  var rate         = pcGetRate(idx);
+  var sym          = pcCurrencySymbols[idx];
+
+  var purchaseCost   = pcGetVal('pcPurchaseCost');
+  var packagingCost  = pcGetVal('pcPackagingCost');
+  var additionalCost = pcGetVal('pcAdditionalCost');
+  var headFreight       = pcGetVal('pcHeadFreight');
+  var fbaDeliveryForeign = pcGetVal('pcFbaDelivery');
+  var fbaDelivery       = fbaDeliveryForeign * rate;
+  var warehouseFee      = pcGetVal('pcWarehouseFee');
+  var sellingPrice   = pcGetVal('pcSellingPrice');
+  var discountRate   = pcGetVal('pcDiscountRate');
+  var couponAmount   = pcGetVal('pcCouponAmount');
+  var commissionRate = pcGetVal('pcCommission');
+  var advertisingCost = pcGetVal('pcAdvertisingCost');
+  var marginAdjust   = parseInt(document.getElementById('pcMarginSlider').value) || 15;
+
+  if (sellingPrice <= 0) {
+    showToast('请先输入有效的产品售价');
+    return;
+  }
+
+  // Check for negative values
+  var allVals = [purchaseCost, packagingCost, additionalCost, headFreight, fbaDeliveryForeign, warehouseFee, discountRate, couponAmount, commissionRate, advertisingCost];
+  for (var v = 0; v < allVals.length; v++) {
+    if (allVals[v] < 0) { showToast('存在负数参数，请检查后重试'); return; }
+  }
+  if (discountRate > 100 || discountRate < 0) { showToast('折扣比例需在 0% - 100% 之间'); return; }
+
+  showLoading();
+
+  setTimeout(function() {
+    // Revenue calculation
+    var fullPriceRMB = sellingPrice * rate;
+    var discountRMB = fullPriceRMB * discountRate / 100;
+    var couponRMB = couponAmount * rate;
+    var actualRevenue = fullPriceRMB - discountRMB - couponRMB;
+
+    // Cost breakdown
+    var totalProductCost = purchaseCost + packagingCost + additionalCost;
+    var totalLogisticsCost = headFreight + fbaDelivery + warehouseFee;
+    var platformCommission = fullPriceRMB * (1 - discountRate / 100) * commissionRate / 100;
+    var totalPlatformCost = platformCommission;
+    var totalMarketingCost = advertisingCost;
+
+    var totalCost = totalProductCost + totalLogisticsCost + totalPlatformCost + totalMarketingCost;
+    var grossProfit = actualRevenue - totalProductCost - totalLogisticsCost;
+    var netProfit = actualRevenue - totalCost;
+
+    var grossMargin = actualRevenue > 0 ? (grossProfit / actualRevenue * 100) : 0;
+    var netMargin = actualRevenue > 0 ? (netProfit / actualRevenue * 100) : 0;
+
+    // Suggested prices
+    var effectiveRate = rate * (1 - discountRate / 100);
+    var breakEvenForeign = effectiveRate > 0 ? totalCost / effectiveRate : 0;
+    var normalProfitForeign = effectiveRate > 0 ? (totalCost * (1 + marginAdjust / 100)) / effectiveRate : 0;
+    var highProfitForeign = effectiveRate > 0 ? (totalCost * (1 + marginAdjust * 2 / 100)) / effectiveRate : 0;
+
+    pcLastResult = {
+      site: pcSiteNames[idx], sym: sym, rate: rate,
+      purchaseCost: purchaseCost, packagingCost: packagingCost, additionalCost: additionalCost,
+      headFreight: headFreight, fbaDelivery: fbaDelivery, fbaDeliveryForeign: fbaDeliveryForeign, warehouseFee: warehouseFee,
+      sellingPrice: sellingPrice, discountRate: discountRate, couponAmount: couponAmount,
+      commissionRate: commissionRate, advertisingCost: advertisingCost,
+      marginAdjust: marginAdjust,
+      fullPriceRMB: fullPriceRMB, discountRMB: discountRMB, couponRMB: couponRMB,
+      actualRevenue: actualRevenue,
+      totalProductCost: totalProductCost, totalLogisticsCost: totalLogisticsCost,
+      totalPlatformCost: totalPlatformCost, totalMarketingCost: totalMarketingCost,
+      totalCost: totalCost, grossProfit: grossProfit, netProfit: netProfit,
+      grossMargin: grossMargin, netMargin: netMargin,
+      breakEvenForeign: breakEvenForeign, normalProfitForeign: normalProfitForeign, highProfitForeign: highProfitForeign
+    };
+
+    pcUpdateCommissionDisplay();
+    pcRenderResults();
+    hideLoading();
+  }, 200);
+}
+
+function pcRenderResults() {
+  var r = pcLastResult;
+  if (!r) return;
+
+  var section = document.getElementById('pcResultSection');
+  var grossClass = r.grossMargin >= 20 ? 'rate-green' : (r.grossMargin >= 5 ? 'rate-yellow' : 'rate-red');
+  var netClass = r.netMargin >= 15 ? 'rate-green' : (r.netMargin >= 0 ? 'rate-yellow' : 'rate-red');
+  var isLoss = r.netProfit < 0;
+
+  var html = '';
+
+  html += '<div class="summary-panel" style="grid-template-columns:repeat(3,1fr)">';
+  html += '<div class="summary-item"><div class="summary-label">单件总成本</div><div class="summary-value">¥' + r.totalCost.toFixed(2) + '</div></div>';
+  html += '<div class="summary-item"><div class="summary-label">单件毛利润</div><div class="summary-value ' + (r.grossProfit >= 0 ? 'rate-green' : 'rate-red') + '">¥' + r.grossProfit.toFixed(2) + '</div></div>';
+  html += '<div class="summary-item"><div class="summary-label">单件净利润</div><div class="summary-value ' + (r.netProfit >= 0 ? 'rate-green' : 'rate-red') + '">¥' + r.netProfit.toFixed(2) + '</div></div>';
+  html += '</div>';
+
+  html += '<div class="summary-panel" style="grid-template-columns:repeat(3,1fr)">';
+  html += '<div class="summary-item"><div class="summary-label">毛利率</div><div class="summary-value ' + grossClass + '">' + r.grossMargin.toFixed(2) + '%</div></div>';
+  html += '<div class="summary-item"><div class="summary-label">净利率</div><div class="summary-value ' + netClass + '">' + r.netMargin.toFixed(2) + '%</div></div>';
+  html += '<div class="summary-item"><div class="summary-label">保本最低售价</div><div class="summary-value rate-red">' + r.sym + r.breakEvenForeign.toFixed(2) + '</div></div>';
+  html += '</div>';
+
+  if (isLoss) {
+    html += '<div class="pc-loss-warn">当前定价处于亏损状态，建议参考下方建议售价调整</div>';
+  }
+
+  // Bill detail
+  html += '<div class="pc-bill-block">';
+  html += '<h3>明细账单</h3>';
+  html += '<table class="pc-bill-table">';
+  html += '<tr class="pc-bill-cat"><td colspan="2"><span class="pc-bill-dot pc-dot-fixed"></span>固定成本</td></tr>';
+  html += '<tr><td>采购成本</td><td>¥' + r.purchaseCost.toFixed(2) + '</td></tr>';
+  html += '<tr><td>包装成本</td><td>¥' + r.packagingCost.toFixed(2) + '</td></tr>';
+  html += '<tr><td>附加成本</td><td>¥' + r.additionalCost.toFixed(2) + '</td></tr>';
+
+  html += '<tr class="pc-bill-cat"><td colspan="2"><span class="pc-bill-dot pc-dot-variable"></span>可变成本</td></tr>';
+  html += '<tr><td>头程运费</td><td>¥' + r.headFreight.toFixed(2) + '</td></tr>';
+  html += '<tr><td>FBA尾程配送 (' + r.sym + r.fbaDeliveryForeign.toFixed(2) + ')</td><td>¥' + r.fbaDelivery.toFixed(2) + '</td></tr>';
+  html += '<tr><td>海外仓杂费</td><td>¥' + r.warehouseFee.toFixed(2) + '</td></tr>';
+
+  html += '<tr class="pc-bill-cat"><td colspan="2"><span class="pc-bill-dot pc-dot-platform"></span>平台扣费</td></tr>';
+  html += '<tr><td>平台佣金 (售价×' + r.commissionRate.toFixed(1) + '%)</td><td>¥' + r.totalPlatformCost.toFixed(2) + '</td></tr>';
+  html += '<tr><td>优惠券抵扣</td><td>-¥' + r.couponRMB.toFixed(2) + '</td></tr>';
+
+  html += '<tr class="pc-bill-cat"><td colspan="2"><span class="pc-bill-dot pc-dot-marketing"></span>营销成本</td></tr>';
+  html += '<tr><td>广告单次分摊</td><td>¥' + r.totalMarketingCost.toFixed(2) + '</td></tr>';
+
+  html += '<tr class="pc-bill-total"><td>合计支出</td><td>¥' + r.totalCost.toFixed(2) + '</td></tr>';
+  html += '<tr class="pc-bill-total"><td>实收金额</td><td>¥' + r.actualRevenue.toFixed(2) + '</td></tr>';
+  html += '<tr class="pc-bill-total" style="' + (r.netProfit < 0 ? 'color:var(--danger)' : 'color:var(--success)') + '"><td>纯利润</td><td>¥' + r.netProfit.toFixed(2) + '</td></tr>';
+  html += '</table></div>';
+
+  // Suggested prices
+  html += '<div class="pc-suggest-grid">';
+  html += '<div class="pc-suggest-card break-even"><div class="pc-suggest-label">保本售价</div><div class="pc-suggest-price">' + r.sym + r.breakEvenForeign.toFixed(2) + '</div><div class="pc-suggest-sub">刚好覆盖所有成本</div></div>';
+  html += '<div class="pc-suggest-card normal"><div class="pc-suggest-label">常规盈利 (' + r.marginAdjust + '%利润)</div><div class="pc-suggest-price">' + r.sym + r.normalProfitForeign.toFixed(2) + '</div><div class="pc-suggest-sub">净利润 ¥' + (r.totalCost * r.marginAdjust / 100).toFixed(2) + '</div></div>';
+  html += '<div class="pc-suggest-card high"><div class="pc-suggest-label">高利润 (' + (r.marginAdjust * 2) + '%利润)</div><div class="pc-suggest-price">' + r.sym + r.highProfitForeign.toFixed(2) + '</div><div class="pc-suggest-sub">净利润 ¥' + (r.totalCost * r.marginAdjust * 2 / 100).toFixed(2) + '</div></div>';
+  html += '</div>';
+
+  section.innerHTML = html;
+  section.classList.add('show');
+  document.getElementById('btnPcCopyReport').style.display = '';
+}
+
+function pcReset() {
+  document.getElementById('pcSite').value = '0';
+  document.getElementById('pcCommission').value = '';
+  document.getElementById('pcMarginSlider').value = '15';
+  document.getElementById('pcSliderVal').textContent = '15%';
+  document.getElementById('pcPurchaseCost').value = '';
+  document.getElementById('pcPackagingCost').value = '';
+  document.getElementById('pcAdditionalCost').value = '';
+  document.getElementById('pcHeadFreight').value = '';
+  document.getElementById('pcFbaDelivery').value = '';
+  document.getElementById('pcWarehouseFee').value = '';
+  document.getElementById('pcSellingPrice').value = '';
+  document.getElementById('pcDiscountRate').value = '';
+  document.getElementById('pcCouponAmount').value = '';
+  document.getElementById('pcAdvertisingCost').value = '';
+  document.getElementById('pcCalcCommission').value = '-';
+  document.getElementById('pcResultSection').classList.remove('show');
+  document.getElementById('pcResultSection').innerHTML = '';
+  document.getElementById('btnPcCopyReport').style.display = 'none';
+  pcLastResult = null;
+  pcUpdateSite();
+}
+
+function pcCopyReport() {
+  var r = pcLastResult;
+  if (!r) return;
+
+  var text = '===== 亚马逊利润核算报告 =====\n\n';
+  text += '站点：' + r.site + ' | 汇率：1 ' + (r.sym === '¥' ? 'JPY' : r.sym.replace('$','USD').replace('£','GBP').replace('€','EUR')) + ' = ' + r.rate.toFixed(2) + ' CNY\n\n';
+
+  text += '【成本明细】\n';
+  text += '采购成本：¥' + r.purchaseCost.toFixed(2) + '\n';
+  text += '包装成本：¥' + r.packagingCost.toFixed(2) + '\n';
+  text += '附加成本：¥' + r.additionalCost.toFixed(2) + '\n';
+  text += '头程运费：¥' + r.headFreight.toFixed(2) + '\n';
+  text += 'FBA尾程配送(' + r.sym + r.fbaDeliveryForeign.toFixed(2) + ')：¥' + r.fbaDelivery.toFixed(2) + '\n';
+  text += '海外仓杂费：¥' + r.warehouseFee.toFixed(2) + '\n';
+  text += '平台佣金(' + r.commissionRate.toFixed(1) + '%)：¥' + r.totalPlatformCost.toFixed(2) + '\n';
+  text += '优惠券抵扣：-¥' + r.couponRMB.toFixed(2) + '\n';
+  text += '广告分摊：¥' + r.totalMarketingCost.toFixed(2) + '\n\n';
+
+  text += '【汇总】\n';
+  text += '单件总成本：¥' + r.totalCost.toFixed(2) + '\n';
+  text += '实收金额：¥' + r.actualRevenue.toFixed(2) + '\n';
+  text += '单件毛利润：¥' + r.grossProfit.toFixed(2) + '\n';
+  text += '单件净利润：¥' + r.netProfit.toFixed(2) + '\n';
+  text += '毛利率：' + r.grossMargin.toFixed(2) + '%\n';
+  text += '净利率：' + r.netMargin.toFixed(2) + '%\n\n';
+
+  text += '【建议售价】\n';
+  text += '保本售价：' + r.sym + r.breakEvenForeign.toFixed(2) + '\n';
+  text += '常规盈利(' + r.marginAdjust + '%)：' + r.sym + r.normalProfitForeign.toFixed(2) + '\n';
+  text += '高利润(' + (r.marginAdjust * 2) + '%)：' + r.sym + r.highProfitForeign.toFixed(2) + '\n';
+
+  copyToClipboard(text);
+}
+
+pcInit();
+
+// ===== 运营辅助工具合集 =====
+
+// --- 文案格式化 ---
+
+function otFormatText() {
+  var raw = document.getElementById('otFormatInput').value;
+  if (!raw.trim()) { showToast('请先粘贴需要格式化的文案'); return; }
+
+  var result = raw
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n')
+    .replace(/[\uFFFD\u200B\u200C\u200D\u200E\u200F\uFEFF\u00A0]/g, '')
+    .replace(/[★■◆●○◇△▲▼▽☆♡♥♦♣♠•·…‥※〓◈❖✧✦✶✷✸✹✺✻✼✽✾✿❀❁❂❃❄❅❆❇❈❉❊❋]/g, '')
+    .replace(/[□©®™℃℉№¶§†‡◊←↑→↓↔↕↨➔➘➙➚➛➜➝➞➟➠➡➢➣➤➥➦➧➨➩➪➫➬➭➮➯]/g, '')
+    .replace(/[^\S\n]+/g, ' ')
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n[ \t]+/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+
+  var output = document.getElementById('otFormatOutput');
+  output.textContent = result;
+  document.getElementById('btnOtCopyFormat').style.display = '';
+}
+
+function otClearFormat() {
+  document.getElementById('otFormatInput').value = '';
+  document.getElementById('otFormatOutput').textContent = '';
+  document.getElementById('btnOtCopyFormat').style.display = 'none';
+}
+
+function otCopyFormatted() {
+  var text = document.getElementById('otFormatOutput').textContent;
+  if (!text) { showToast('暂无格式化内容可复制'); return; }
+  copyToClipboard(text);
+}
+
+// --- 类目匹配 ---
+
+var otAttrFilter = [
+  // 功能属性
+  '防水','运动','无线','蓝牙','防摔','防滑','防震','防尘','防刮','耐磨','抗菌','环保','静音','速干','透气','保暖',
+  '隔热','防晒','免洗','免烫','自清洁','易清洗','可拆卸','可折叠','可调节','可充电','充电式','自动','手动','电动',
+  '多功能','多用途','两用','三合一','二合一',
+  // 材质属性
+  '304不锈钢','不锈钢','304','纯棉','棉质','丝绒','哑光','陶瓷','玻璃','金属','木质','塑料','硅胶','橡胶',
+  '铝合金','锌合金','abs','pc','tpe','tpu','真皮','碳纤维','牛津布','尼龙','涤纶','亚克力',
+  // 规格尺寸
+  '大容量','大号','小号','中号','均码','s码','m码','l码','xl码','xxl码','xs码','迷你','超薄','轻薄',
+  '加厚','加长','加大','加宽','15.6英寸','13.3英寸','14英寸','16英寸','17英寸',
+  // 场景季节
+  '夏季','冬季','春秋','户外','室内','家用','办公','商务','旅行','露营','车载','便携',
+  // 风格设计
+  '简约','时尚','复古','现代','北欧','ins风','韩版','日系','欧式','美式','经典','创意','高档','高级',
+  '轻奢','可爱','ins','文艺','极简','宽松','短袖','无袖','长袖','修身','紧身',
+  // 品牌产地
+  '德国进口','日本进口','美国进口','进口','国产',
+  // 包装形态
+  '套装','礼盒装','散装','袋装','盒装','带盖','无盖',
+  // 人群特性
+  '男女同款','男士','女士','儿童','婴儿','成人','通用','老年人',
+  // 颜色
+  '黑色','白色','红色','蓝色','绿色','黄色','粉色','紫色','灰色','棕色','金色','银色','透明',
+  '橙色','青色','米色','卡其','酒红','玫红','藏青','深蓝','墨绿',
+  // 卖点修饰
+  '持久','不沾杯','新款','爆款','热销','升级版','加强版','基础版','豪华版','经济型','标准型',
+  '有机','天然','无味','清香','强力','温和','敏感肌适用',
+  // 层数数量
+  '2层','3层','4层','双层','三层','多层','单层','5件套','6件套','8件套','10件套',
+  // English attributes
+  'waterproof','sport','wireless','bluetooth','stainless','steel','ceramic','glass','plastic','silicone',
+  'rubber','metal','wood','cotton','leather','nylon','polyester','aluminum','copper','abs','pc','tpe',
+  'large','small','medium','mini','compact','thin','thick','lightweight','heavy','premium','deluxe',
+  'portable','foldable','adjustable','rechargeable','washable','breathable','eco-friendly','organic',
+  'natural','professional','home','office','outdoor','indoor','travel','summer','winter',
+  'matte','velvet','bamboo','carbon','fiber','oxford','transparent','sleeve','short','long','loose',
+  'imported','set','new','hot','best','pro','max','plus','ultra','lite','retro','vintage','modern',
+  'classic','creative','luxury','elegant','simple'
+];
+
+var otCategoryMap = [
+  // 电子产品
+  { kw: ['耳机','earphone','headphone','headset','earbud','earbuds','airpods','耳塞','蓝牙耳机','无线耳机','运动耳机'], cat1: 'Electronics', cat2: 'Headphones & Earbuds' },
+  { kw: ['手机壳','phone case','手机套','保护壳','保护套','iphone case','samsung case','手机保护壳'], cat1: 'Cell Phones & Accessories', cat2: 'Phone Cases' },
+  { kw: ['充电器','charger','充电线','充电宝','powerbank','power bank','充电头','充电插头','快充','快速充电器'], cat1: 'Cell Phones & Accessories', cat2: 'Chargers & Power Banks' },
+  { kw: ['数据线','cable','usb cable','lightning cable','type-c','type c','typec','充电数据线','usb线'], cat1: 'Cell Phones & Accessories', cat2: 'Cables & Adapters' },
+  { kw: ['蓝牙音箱','bluetooth speaker','speaker','音响','便携音箱','无线音箱','户外音箱','小音箱'], cat1: 'Electronics', cat2: 'Portable Speakers' },
+  { kw: ['智能手表','smartwatch','smart watch','手表','watch','电子手表','运动手表','智能手环','fitness tracker'], cat1: 'Electronics', cat2: 'Smartwatches' },
+  { kw: ['键盘','keyboard','鼠标','mouse','电脑配件','computer','电竞','gaming','机械键盘','无线键盘','无线鼠标'], cat1: 'Electronics', cat2: 'Computer Accessories' },
+  { kw: ['鼠标垫','mouse pad','mousepad','桌垫','desk mat','游戏鼠标垫','电竞鼠标垫'], cat1: 'Electronics', cat2: 'Computer Accessories' },
+  { kw: ['手机支架','phone stand','phone holder','平板支架','tablet stand','懒人支架','桌面支架','车载支架'], cat1: 'Cell Phones & Accessories', cat2: 'Phone Stands & Holders' },
+  { kw: ['屏幕保护膜','screen protector','钢化膜','tempered glass','手机膜','平板膜','保护膜','贴膜'], cat1: 'Cell Phones & Accessories', cat2: 'Screen Protectors' },
+  { kw: ['相机','camera','摄影','photography','三脚架','tripod','sd卡','sd card','镜头','lens','相机包','camera bag'], cat1: 'Electronics', cat2: 'Camera & Photo' },
+
+  // 家居厨房
+  { kw: ['水杯','water bottle','水瓶','保温杯','travel mug','tumbler','随行杯','运动水杯','咖啡杯'], cat1: 'Home & Kitchen', cat2: 'Water Bottles & Tumblers' },
+  { kw: ['马克杯','mug','coffee mug','茶杯','tea cup','玻璃杯','glass cup','陶瓷杯','ceramic mug','牛奶杯'], cat1: 'Home & Kitchen', cat2: 'Mugs & Cups' },
+  { kw: ['厨房用具','kitchen','厨房','锅','pan','刀','knife','砧板','cutting board','锅铲','锅具','厨具'], cat1: 'Home & Kitchen', cat2: 'Kitchen Utensils & Gadgets' },
+  { kw: ['收纳盒','storage box','收纳箱','整理箱','organizer','储物盒','储物箱','塑料收纳','桌面收纳'], cat1: 'Home & Kitchen', cat2: 'Storage & Organization' },
+  { kw: ['装饰','decor','墙贴','wall sticker','挂画','wall art','相框','photo frame','摆件','ornament','装饰画'], cat1: 'Home & Kitchen', cat2: 'Home Decor' },
+  { kw: ['床上用品','bedding','床单','sheet','枕头','pillow','被子','blanket','四件套','bed set','枕套','pillowcase'], cat1: 'Home & Kitchen', cat2: 'Bedding' },
+  { kw: ['床垫','mattress','床褥','topper','床笠','fitted sheet','床垫套','床垫保护罩'], cat1: 'Home & Kitchen', cat2: 'Mattresses & Toppers' },
+  { kw: ['清洁','cleaning','清洁剂','cleaner','拖把','mop','抹布','cloth','海绵','sponge','清洁工具'], cat1: 'Home & Kitchen', cat2: 'Cleaning Supplies' },
+  { kw: ['窗帘','curtains','curtain','遮光帘','blackout curtain','纱帘','sheer curtain','百叶窗','窗纱'], cat1: 'Home & Kitchen', cat2: 'Curtains & Drapes' },
+  { kw: ['地毯','rug','carpet','地垫','floor mat','门垫','door mat','浴室垫','bath mat','玄关垫'], cat1: 'Home & Kitchen', cat2: 'Rugs & Mats' },
+  { kw: ['毛巾','towel','浴巾','bath towel','面巾','face towel','手巾','hand towel','干发帽'], cat1: 'Home & Kitchen', cat2: 'Towels' },
+  { kw: ['浴室用品','bathroom','浴帘','shower curtain','牙刷架','toothbrush holder','肥皂架','soap dish','浴室架'], cat1: 'Home & Kitchen', cat2: 'Bathroom Accessories' },
+  { kw: ['灯具','lamp','light','台灯','desk lamp','夜灯','night light','灯条','strip light','吊灯','pendant','落地灯','floor lamp','壁灯','壁灯','吸顶灯','ceiling','led灯'], cat1: 'Tools & Home Improvement', cat2: 'Lighting & Ceiling Fans' },
+  { kw: ['镜子','mirror','化妆镜','makeup mirror','台式镜','table mirror','墙面镜','wall mirror','全身镜'], cat1: 'Home & Kitchen', cat2: 'Mirrors' },
+  { kw: ['衣架','hanger','clothes hanger','晾衣架','drying rack','挂钩','hook','粘钩','门后挂钩'], cat1: 'Home & Kitchen', cat2: 'Laundry & Storage' },
+
+  // 服装鞋帽
+  { kw: ['衣服','clothing','t-shirt','tshirt','shirt','衬衫','连衣裙','dress','jacket','外套','hoodie','卫衣','裤子','pants','短袖','t恤','无袖','长袖','上衣','t shirt'], cat1: 'Clothing, Shoes & Jewelry', cat2: 'Clothing' },
+  { kw: ['鞋子','shoes','sneakers','运动鞋','跑鞋','running shoes','拖鞋','slippers','凉鞋','sandals','靴子','boots','帆布鞋'], cat1: 'Clothing, Shoes & Jewelry', cat2: 'Shoes' },
+  { kw: ['背包','backpack','书包','双肩包','travel bag','旅行包','户外包','电脑包','laptop bag'], cat1: 'Clothing, Shoes & Jewelry', cat2: 'Backpacks' },
+  { kw: ['旅行箱','luggage','suitcase','行李箱','登机箱','carry on','拉杆箱','旅行袋','旅行收纳'], cat1: 'Clothing, Shoes & Jewelry', cat2: 'Luggage & Travel Gear' },
+  { kw: ['袜子','socks','短袜','长袜','船袜','运动袜','隐形袜','ankle socks','棉袜'], cat1: 'Clothing, Shoes & Jewelry', cat2: 'Socks & Hosiery' },
+  { kw: ['帽子','hat','cap','棒球帽','baseball cap','渔夫帽','bucket hat','遮阳帽','sun hat','毛线帽','beanie'], cat1: 'Clothing, Shoes & Jewelry', cat2: 'Hats & Caps' },
+  { kw: ['围巾','scarf','丝巾','披肩','shawl','保暖围巾','羊绒围巾'], cat1: 'Clothing, Shoes & Jewelry', cat2: 'Scarves & Shawls' },
+  { kw: ['珠宝','jewelry','项链','necklace','手链','bracelet','耳环','earrings','戒指','ring','首饰','饰品','手镯'], cat1: 'Clothing, Shoes & Jewelry', cat2: 'Jewelry' },
+  { kw: ['收纳袋','packing cubes','storage bag','整理袋','衣物袋','laundry bag','旅行收纳袋'], cat1: 'Clothing, Shoes & Jewelry', cat2: 'Luggage & Travel Gear' },
+
+  // 美妆护肤
+  { kw: ['化妆','makeup','口红','lipstick','粉底','foundation','眼影','eyeshadow','化妆刷','makeup brush','睫毛膏','mascara','腮红','blush'], cat1: 'Beauty & Personal Care', cat2: 'Makeup' },
+  { kw: ['护肤','skincare','面霜','cream','精华','serum','面膜','face mask','防晒','sunscreen','乳液','lotion','爽肤水','toner'], cat1: 'Beauty & Personal Care', cat2: 'Skin Care' },
+
+  // 运动户外
+  { kw: ['瑜伽垫','yoga mat','瑜伽','健身垫','exercise mat','运动垫','普拉提垫'], cat1: 'Sports & Outdoors', cat2: 'Yoga Mats' },
+  { kw: ['健身','fitness','哑铃','dumbbell','阻力带','resistance band','跳绳','jump rope','健身器材','弹力带','握力器'], cat1: 'Sports & Outdoors', cat2: 'Fitness Equipment' },
+  { kw: ['露营','camping','帐篷','tent','睡袋','sleeping bag','野餐','picnic','露营灯','野餐垫','折叠椅','camping chair'], cat1: 'Sports & Outdoors', cat2: 'Camping & Hiking' },
+
+  // 宠物
+  { kw: ['宠物','pet','dog','cat','狗','猫','宠物用品','pet supplies','leash','牵引绳','宠物玩具','pet toy','狗粮','猫粮','宠物碗','宠物窝','猫砂'], cat1: 'Pet Supplies', cat2: 'Pet Supplies' },
+
+  // 玩具
+  { kw: ['玩具','toy','toys','积木','blocks','娃娃','doll','遥控','rc car','拼图','puzzle','桌游','board game','安抚玩具'], cat1: 'Toys & Games', cat2: 'Toys' },
+
+  // 母婴
+  { kw: ['婴儿','baby','婴儿用品','奶瓶','bottle','婴儿服','baby clothes','尿布','diaper','婴儿玩具','baby toy','围兜','bib','婴儿车','stroller'], cat1: 'Baby Products', cat2: 'Baby Care' },
+
+  // 办公
+  { kw: ['办公用品','office','文具','stationery','笔','pen','笔记本','notebook','便签','sticky notes','文件夹','剪刀','scissors','胶带','tape'], cat1: 'Office Products', cat2: 'Office Supplies' },
+
+  // 汽车
+  { kw: ['汽车配件','car accessories','auto','车载','car charger','车载手机架','汽车坐垫','车用收纳','方向盘套'], cat1: 'Automotive', cat2: 'Car Accessories' },
+
+  // 园艺
+  { kw: ['园艺','garden','花盆','planter','工具','gardening tools','浇花','watering','盆栽','花架','多肉','绿植'], cat1: 'Patio, Lawn & Garden', cat2: 'Gardening' },
+
+  // 工具
+  { kw: ['工具','tool','tools','螺丝刀','screwdriver','扳手','wrench','工具箱','tool box','锤子','hammer','卷尺','tape measure'], cat1: 'Tools & Home Improvement', cat2: 'Hand Tools' },
+
+  // 食品
+  { kw: ['食品','food','零食','snack','坚果','nuts','糖果','candy','巧克力','chocolate','咖啡','coffee','茶','tea'], cat1: 'Grocery & Gourmet Food', cat2: 'Snack Foods' },
+
+  // 书籍
+  { kw: ['书','book','books','书籍','画册','coloring book','便签本','笔记本','日记本','journal'], cat1: 'Books', cat2: 'Books' },
+
+  // 健康
+  { kw: ['口罩','mask','face mask','手套','gloves','防护','protective','消毒','sanitizer'], cat1: 'Health & Household', cat2: 'Masks & Protective Equipment' },
+  { kw: ['精油','essential oil','香薰','diffuser','加湿器','humidifier','aromatherapy','香薰机','精油扩散器'], cat1: 'Health & Household', cat2: 'Aromatherapy' },
+
+  // 补充类目
+  { kw: ['鞋垫','insole','sole','足弓垫','arch support','减震垫','cushion','增高垫'], cat1: 'Clothing, Shoes & Jewelry', cat2: 'Shoe Care & Insoles' },
+  { kw: ['腰带','belt','皮带','腰带扣','belt buckle','帆布腰带'], cat1: 'Clothing, Shoes & Jewelry', cat2: 'Belts' },
+  { kw: ['太阳镜','sunglasses','墨镜','偏光镜','polarized','防晒镜'], cat1: 'Clothing, Shoes & Jewelry', cat2: 'Sunglasses' },
+  { kw: ['雨伞','umbrella','遮阳伞','折叠伞','太阳伞','自动伞'], cat1: 'Clothing, Shoes & Jewelry', cat2: 'Umbrellas' },
+  { kw: ['钱包','wallet','卡包','card holder','零钱包','coin purse','证件包','rfid'], cat1: 'Clothing, Shoes & Jewelry', cat2: 'Wallets & Card Cases' },
+  { kw: ['杯垫','coaster','桌垫','餐垫','placemat','杯托','硅胶垫'], cat1: 'Home & Kitchen', cat2: 'Table Linens & Placemats' },
+  { kw: ['花瓶','vase','花器','flower pot','陶瓷花瓶','玻璃花瓶'], cat1: 'Home & Kitchen', cat2: 'Vases' },
+  { kw: ['蜡烛','candle','香薰蜡烛','scented candle','蜡烛台','candle holder','无火香薰'], cat1: 'Home & Kitchen', cat2: 'Candles & Holders' },
+  { kw: ['空气清新剂','air freshener','除味剂','除臭','deodorizer','炭包','charcoal'], cat1: 'Home & Kitchen', cat2: 'Air Fresheners' }
+];
+
+// 从类目词库中自动提取"含属性词的复合词"（如"蓝牙耳机"含属性"蓝牙"，应保护不被拆分）
+var otProtectedCompounds = (function() {
+  var compounds = [];
+  for (var i = 0; i < otCategoryMap.length; i++) {
+    for (var j = 0; j < otCategoryMap[i].kw.length; j++) {
+      var kw = otCategoryMap[i].kw[j].toLowerCase();
+      if (kw.length < 3 || !/^[\u4e00-\u9fff]+$/.test(kw)) continue;
+      for (var a = 0; a < otAttrFilter.length; a++) {
+        var attr = otAttrFilter[a];
+        if (attr.length >= 2 && kw.indexOf(attr) !== -1) {
+          compounds.push(kw);
+          break;
+        }
+      }
+    }
+  }
+  // 去重 + 按长度降序
+  var uniq = [];
+  for (var u = 0; u < compounds.length; u++) {
+    if (uniq.indexOf(compounds[u]) === -1) uniq.push(compounds[u]);
+  }
+  uniq.sort(function(a, b) { return b.length - a.length; });
+  return uniq;
+})();
+
+function otIsAttrWord(word) {
+  var w = word.toLowerCase();
+  if (w.length <= 1) return true;
+  for (var i = 0; i < otAttrFilter.length; i++) {
+    if (w === otAttrFilter[i]) return true;
+  }
+  return false;
+}
+
+function otExtractCoreWords(input) {
+  var lower = input.toLowerCase();
+  var tokens = lower.split(/[\s,，、]+/).filter(function(t) { return t.length > 0; });
+
+  var coreTokens = [];
+  var attrTokens = [];
+
+  if (tokens.length > 1 || (tokens.length === 1 && !/^[\u4e00-\u9fff]+$/.test(tokens[0]))) {
+    for (var i = 0; i < tokens.length; i++) {
+      if (otIsAttrWord(tokens[i])) {
+        attrTokens.push(tokens[i]);
+      } else {
+        coreTokens.push(tokens[i]);
+      }
+    }
+  } else if (tokens.length === 1 && /^[\u4e00-\u9fff]+$/.test(tokens[0])) {
+    var text = tokens[0];
+    var working = text;
+
+    // Step 1: 优先匹配含属性词的复合词（如"蓝牙耳机"），保护不被拆分
+    for (var ci = 0; ci < otProtectedCompounds.length; ci++) {
+      var compound = otProtectedCompounds[ci];
+      if (compound.length < 3) continue;
+      var idx = working.indexOf(compound);
+      if (idx !== -1) {
+        coreTokens.push(compound);
+        working = working.substring(0, idx) + '\x00'.repeat(compound.length) + working.substring(idx + compound.length);
+      }
+    }
+
+    // Step 2: 从剩余文本中移除属性词
+    var sortedAttrs = otAttrFilter.slice().sort(function(a, b) { return b.length - a.length; });
+    for (var j = 0; j < sortedAttrs.length; j++) {
+      var attr = sortedAttrs[j];
+      if (attr.length >= 2 && working.indexOf(attr) !== -1) {
+        working = working.split(attr).join('');
+        attrTokens.push(attr);
+      }
+    }
+
+    // Step 3: 清理占位符，提取剩余核心词
+    var remainder = working.replace(/\x00/g, '');
+    if (remainder.length >= 2) {
+      // 检查剩余文本是否与已有核心词重复
+      var dup = false;
+      for (var di = 0; di < coreTokens.length; di++) {
+        if (coreTokens[di] === remainder) { dup = true; break; }
+      }
+      if (!dup) coreTokens.push(remainder);
+    }
+
+    // Step 4: 如果核心词为空，用滑动窗口从原文中提取可能的核心词
+    if (coreTokens.length === 0) {
+      var added = [];
+      for (var w = 4; w >= 2; w--) {
+        for (var s = 0; s <= text.length - w; s++) {
+          var sub = text.substring(s, s + w);
+          if (!otIsAttrWord(sub)) {
+            // 检查是否与类目词库关键词匹配
+            var useful = false;
+            for (var mi = 0; mi < otCategoryMap.length; mi++) {
+              var entryKws = otCategoryMap[mi].kw;
+              for (var mk = 0; mk < entryKws.length; mk++) {
+                var ekw = entryKws[mk].toLowerCase();
+                if (sub === ekw || ekw.indexOf(sub) !== -1 || sub.indexOf(ekw) !== -1 && ekw.length >= 2) {
+                  useful = true;
+                  break;
+                }
+              }
+              if (useful) break;
+            }
+            if (useful && added.indexOf(sub) === -1) {
+              coreTokens.push(sub);
+              added.push(sub);
+            }
+          }
+        }
+      }
+    }
+
+    if (coreTokens.length === 0) {
+      coreTokens.push(text);
+    }
+  }
+
+  return { core: coreTokens, attr: attrTokens };
+}
+
+function otMatchCategory() {
+  var input = document.getElementById('otCatKeywords').value.trim();
+  if (!input) { showToast('请输入产品关键词'); return; }
+
+  var extracted = otExtractCoreWords(input);
+  var coreTokens = extracted.core;
+  var attrTokens = extracted.attr;
+  var allTokens = input.toLowerCase().split(/[\s,，、]+/).filter(function(t) { return t.length > 0; });
+
+  var results = [];
+  for (var i = 0; i < otCategoryMap.length; i++) {
+    var entry = otCategoryMap[i];
+    var score = 0;
+    var matchedKws = [];
+
+    for (var j = 0; j < entry.kw.length; j++) {
+      var ekw = entry.kw[j].toLowerCase();
+
+      // Core token match — highest weight
+      for (var c = 0; c < coreTokens.length; c++) {
+        var ct = coreTokens[c];
+        if (ct === ekw) {
+          score += 5;
+          if (matchedKws.indexOf(ekw) === -1) matchedKws.push(ekw);
+        } else if (ct.indexOf(ekw) !== -1 && ekw.length >= 2) {
+          score += 4;
+          if (matchedKws.indexOf(ekw) === -1) matchedKws.push(ekw);
+        } else if (ekw.indexOf(ct) !== -1 && ct.length >= 2) {
+          score += 3;
+          if (matchedKws.indexOf(ekw) === -1) matchedKws.push(ekw);
+        }
+      }
+
+      // Attribute token match — medium weight
+      for (var a = 0; a < attrTokens.length; a++) {
+        var at = attrTokens[a];
+        if (at === ekw) {
+          score += 2;
+          if (matchedKws.indexOf(ekw) === -1) matchedKws.push(ekw);
+        } else if (at.indexOf(ekw) !== -1 && ekw.length >= 2) {
+          score += 1;
+          if (matchedKws.indexOf(ekw) === -1) matchedKws.push(ekw);
+        }
+      }
+
+      // Direct substring match on raw input (catch anything missed)
+      for (var r = 0; r < allTokens.length; r++) {
+        var rt = allTokens[r];
+        if (rt.indexOf(ekw) !== -1 && ekw.length >= 2) {
+          var alreadyCounted = false;
+          for (var mc = 0; mc < matchedKws.length; mc++) {
+            if (matchedKws[mc] === ekw) { alreadyCounted = true; break; }
+          }
+          if (!alreadyCounted) {
+            score += 2;
+            matchedKws.push(ekw);
+          }
+        }
+      }
+    }
+
+    if (score > 0) {
+      var priority;
+      if (score >= 6) priority = 'high';
+      else if (score >= 3) priority = 'medium';
+      else priority = 'low';
+
+      results.push({
+        cat1: entry.cat1, cat2: entry.cat2,
+        score: score, matched: matchedKws,
+        priority: priority
+      });
+    }
+  }
+
+  results.sort(function(a, b) { return b.score - a.score; });
+
+  var container = document.getElementById('otCatResults');
+  if (results.length === 0) {
+    container.innerHTML = '<div class="ot-empty-hint">未匹配到对应类目，请尝试更具体的关键词</div>';
+    return;
+  }
+
+  var shown = results.slice(0, 8);
+  var html = '';
+  for (var m = 0; m < shown.length; m++) {
+    var res = shown[m];
+    var badgeText = res.priority === 'high' ? '高匹配' : (res.priority === 'medium' ? '中匹配' : '低匹配');
+    html += '<div class="ot-cat-item">';
+    html += '<span class="ot-priority-badge ot-priority-' + res.priority + '">' + badgeText + '</span>';
+    html += '<span class="ot-cat-path">' + escapeHtml(res.cat1) + '<span class="ot-cat-sep">→</span>' + escapeHtml(res.cat2) + '</span>';
+    html += '<button class="btn-copy" onclick="otCopyCategory(' + m + ')" style="margin-left:8px;flex-shrink:0">复制</button>';
+    html += '</div>';
+  }
+  container.innerHTML = html;
+  container._results = shown;
+}
+
+function otCopyCategory(idx) {
+  var container = document.getElementById('otCatResults');
+  var results = container._results;
+  if (!results || !results[idx]) return;
+  copyToClipboard(results[idx].cat1 + ' > ' + results[idx].cat2);
+}
+
+function otClearCategory() {
+  document.getElementById('otCatKeywords').value = '';
+  document.getElementById('otCatResults').innerHTML = '';
+}
+
+// --- 备货预估 ---
+
+function otCalcInventory() {
+  var daily = parseFloat(document.getElementById('otDailySales').value);
+  var prep  = parseFloat(document.getElementById('otPrepDays').value);
+  var safety = parseFloat(document.getElementById('otSafetyDays').value);
+
+  if (isNaN(daily) || daily < 0) { showToast('请输入有效的日均销量'); return; }
+  if (isNaN(prep) || prep < 0)  { showToast('请输入有效的备货周期天数'); return; }
+  if (isNaN(safety) || safety < 0) { showToast('请输入有效的安全库存天数'); return; }
+
+  var totalStock = Math.round(daily * (prep + safety));
+  var minSafe = Math.round(daily * safety);
+  var reorderPoint = Math.round(daily * prep * 0.35);
+
+  var grid = document.getElementById('otInventoryResult');
+  var html = '';
+  html += '<div class="ot-estimate-item"><div class="ot-estimate-label">合理备货总量</div><div class="ot-estimate-value ot-val-total">' + totalStock + '</div><div class="ot-estimate-sub">覆盖 ' + (prep + safety) + ' 天</div></div>';
+  html += '<div class="ot-estimate-item"><div class="ot-estimate-label">最低安全库存</div><div class="ot-estimate-value ot-val-safe">' + (safety === 0 ? '—' : minSafe) + '</div><div class="ot-estimate-sub">' + (safety === 0 ? '无安全库存' : '不低于此数') + '</div></div>';
+  html += '<div class="ot-estimate-item"><div class="ot-estimate-label">补货提醒线</div><div class="ot-estimate-value ot-val-warn">' + reorderPoint + '</div><div class="ot-estimate-sub">低于此数立即补货</div></div>';
+  grid.innerHTML = html;
+  grid.style.display = '';
+
+  var riskDiv = document.getElementById('otInventoryRisk');
+  if (safety === 0) {
+    riskDiv.innerHTML = '<div class="pc-loss-warn">未设置安全库存，建议预留缓冲天数以应对突发需求波动</div>';
+  } else if (prep > 60) {
+    riskDiv.innerHTML = '<div class="pc-loss-warn">备货周期超过60天，建议关注物流时效与市场需求波动风险</div>';
+  } else if (daily > 50) {
+    riskDiv.innerHTML = '<div class="pc-rate-info" style="margin-bottom:0">日均销量较高，建议每周检查库存水位</div>';
+  } else {
+    riskDiv.innerHTML = '';
+  }
+}
+
+function otClearInventory() {
+  document.getElementById('otDailySales').value = '';
+  document.getElementById('otPrepDays').value = '';
+  document.getElementById('otSafetyDays').value = '';
+  document.getElementById('otInventoryResult').style.display = 'none';
+  document.getElementById('otInventoryResult').innerHTML = '';
+  document.getElementById('otInventoryRisk').innerHTML = '';
+}
+
+// ===== 会员系统 v5（硬编码全局白名单 + Gist云同步 + 跨设备顶号） =====
+
+// === Gist云同步配置（已内置Gist地址和Token） ===
+var GIST_RAW_URL = 'https://gist.githubusercontent.com/lp9999999/822700c8094511bb42bc1142feda9c06/raw/members.json';
+var GIST_ID = '822700c8094511bb42bc1142feda9c06';
+var GITHUB_TOKEN = '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';
+
+const FORCE_GLOBAL_SYNC = true;
+const GLOBAL_AUTH_CODES = [];
+
+var CURRENT_VERSION = 'v4.0';
+var ADMIN_PWD_HASH = '';
+var ADMIN_SALT = 'amz_salt_2026';
+var adminFailCount = 0;
+var adminLockUntil = 0;
+
+var _vipCache = false;
+var _vipExpiry = 0;
+var _vipChecked = false;
+var activateCooldown = 0;
+var activateCodeUsed = '';
+
+function getToday() {
+  var d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+function _lsSet(key, val) {
+  try { localStorage.setItem(key, val); return true; } catch (e) {
+    try { localStorage.clear(); localStorage.setItem(key, val); return true; } catch (e2) { return false; }
+  }
+}
+
+function _lsGet(key) {
+  try { return localStorage.getItem(key); } catch (e) { return null; }
+}
+
+function _lsRemove(key) {
+  try { localStorage.removeItem(key); } catch (e) {}
+}
+
+function _lsSetJSON(key, obj) {
+  try { return _lsSet(key, JSON.stringify(obj)); } catch (e) { return false; }
+}
+
+function _lsGetJSON(key) {
+  try { var s = _lsGet(key); return s ? JSON.parse(s) : null; } catch (e) { return null; }
+}
+
+// === Gist云同步核心 ===
+
+async function fetchGistData() {
+  if (!GIST_RAW_URL) return null;
+  try {
+    var resp = await fetch(GIST_RAW_URL + '?t=' + Date.now());
+    if (!resp.ok) return null;
+    var text = await resp.text();
+    var data = JSON.parse(text);
+    return Array.isArray(data) ? data : null;
+  } catch (e) { return null; }
+}
+
+async function updateGistData(codes) {
+  if (!GIST_ID || !GITHUB_TOKEN) return false;
+  try {
+    var resp = await fetch('https://api.github.com/gists/' + GIST_ID, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': 'token ' + GITHUB_TOKEN,
+        'Content-Type': 'application/json',
+        'Accept': 'application/vnd.github.v3+json'
+      },
+      body: JSON.stringify({
+        files: { 'members.json': { content: JSON.stringify(codes, null, 2) } }
+      })
+    });
+    return resp.ok;
+  } catch (e) { return false; }
+}
+
+function mergeGistIntoGlobal(gistData) {
+  var existingCodes = {};
+  for (var i = 0; i < GLOBAL_AUTH_CODES.length; i++) {
+    existingCodes[GLOBAL_AUTH_CODES[i].code] = GLOBAL_AUTH_CODES[i];
+  }
+  for (var k = 0; k < gistData.length; k++) {
+    var gc = gistData[k];
+    if (!gc.hasOwnProperty('lastActive')) gc.lastActive = 0;
+    if (!gc.hasOwnProperty('revoked')) gc.revoked = false;
+    existingCodes[gc.code] = gc;
+  }
+  GLOBAL_AUTH_CODES.length = 0;
+  for (var code in existingCodes) {
+    GLOBAL_AUTH_CODES.push(existingCodes[code]);
+  }
+  syncAuthCodesToLS();
+}
+
+function saveMemberInfo() {
+  var now = Date.now();
+  var data = { code: activateCodeUsed, expiry: _vipExpiry, lastActive: now };
+  if (_lsSetJSON('amzMemberInfo', data)) return true;
+  showToast('存储失败（浏览器空间满或无痕模式）');
+  return false;
+}
+
+function loadMemberInfo() {
+  _vipChecked = true;
+  var data = _lsGetJSON('amzMemberInfo');
+  if (!data) { _vipCache = false; _vipExpiry = 0; return false; }
+  if (!/^AMZ-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(data.code || '')) {
+    _lsRemove('amzMemberInfo'); _vipCache = false; _vipExpiry = 0; return false;
+  }
+  if (data.expiry <= Date.now()) {
+    _lsRemove('amzMemberInfo'); _vipCache = false; _vipExpiry = 0;
+    showToast('授权码已过期，请续费');
+    return false;
+  }
+  var found = null;
+  for (var i = 0; i < GLOBAL_AUTH_CODES.length; i++) {
+    if (GLOBAL_AUTH_CODES[i].code === data.code) { found = GLOBAL_AUTH_CODES[i]; break; }
+  }
+  if (!found || found.revoked) {
+    _lsRemove('amzMemberInfo'); _vipCache = false; _vipExpiry = 0;
+    updateVIPButton();
+    showToast('授权码已失效，请重新激活');
+    return false;
+  }
+  // 跨设备顶号：对比本地lastActive与全局lastActive
+  if (FORCE_GLOBAL_SYNC && found.lastActive > 0) {
+    var localLastActive = data.lastActive || 0;
+    if (localLastActive !== found.lastActive) {
+      _lsRemove('amzMemberInfo'); _vipCache = false; _vipExpiry = 0;
+      updateVIPButton();
+      showToast('该会员码已在其他设备登录，请重新激活');
+      return false;
+    }
+  }
+  activateCodeUsed = data.code;
+  _vipExpiry = data.expiry;
+  _vipCache = true;
+  updateVIPButton();
+  checkExpiryReminder();
+  return true;
+}
+
+function isVIP() {
+  if (!_vipChecked) return false;
+  return _vipCache;
+}
+
+function getVIPExpiry() { return _vipExpiry; }
+
+function updateVIPButton() {
+  var btn = document.getElementById('vipBtn');
+  var actBtn = document.getElementById('activateBtn');
+  if (isVIP()) {
+    if (btn) { btn.textContent = '已开通会员'; btn.className = 'vip-btn active-member'; }
+    if (actBtn) {
+      actBtn.textContent = '会员有效期：' + new Date(_vipExpiry).toLocaleDateString('zh-CN');
+      actBtn.style.background = 'linear-gradient(135deg,#22C55E,#16A34A)';
+      actBtn.style.display = '';
+    }
+  } else {
+    if (btn) { btn.textContent = '开通会员'; btn.className = 'vip-btn'; }
+    if (actBtn) {
+      actBtn.textContent = '激活会员';
+      actBtn.style.background = 'linear-gradient(135deg,#3B82F6,#2563EB)';
+      actBtn.style.display = '';
+    }
+  }
+}
+
+function useModule(name) {
+  if (isVIP()) return true;
+  var key = 'amz_usage_' + name;
+  var today = getToday();
+  var data = _lsGetJSON(key);
+  if (!data || data.date !== today) { data = { date: today, count: 0 }; }
+  if (data.count >= 3) {
+    showToast('今日次数已用完，明日0点自动重置或开通会员无限使用');
+    return false;
+  }
+  data.count++;
+  _lsSetJSON(key, data);
+  return true;
+}
+
+function showVIPModal() { document.getElementById('vipModal').classList.add('show'); }
+function closeVIPModal() { document.getElementById('vipModal').classList.remove('show'); }
+
+function showActivateModal() {
+  if (isVIP()) { showToast('您已是会员，无需重复激活'); return; }
+  var now = Date.now();
+  if (now < activateCooldown) {
+    var remain = Math.ceil((activateCooldown - now) / 1000);
+    showToast('请等待 ' + remain + ' 秒后再试');
+    return;
+  }
+  document.getElementById('activateCodeInput').value = '';
+  document.getElementById('activateCooldownTxt').textContent = '';
+  document.getElementById('activateModal').classList.add('show');
+}
+
+function closeActivateModal() { document.getElementById('activateModal').classList.remove('show'); }
+
+function syncAuthCodesToLS() {
+  _lsSetJSON('amz_auth_codes', GLOBAL_AUTH_CODES);
+}
+
+function getAdminLogs() {
+  return _lsGetJSON('amz_admin_logs') || [];
+}
+
+function saveAdminLogs(list) { _lsSetJSON('amz_admin_logs', list); }
+
+function addAdminLog(action, detail) {
+  var logs = getAdminLogs();
+  logs.unshift({ time: new Date().toLocaleString('zh-CN'), action: action, detail: detail });
+  if (logs.length > 100) logs = logs.slice(0, 100);
+  saveAdminLogs(logs);
+}
+
+function validateAuthCode(code) {
+  code = code.toUpperCase().trim();
+  if (!/^AMZ-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(code)) return { valid: false, reason: '授权码格式错误' };
+  for (var i = 0; i < GLOBAL_AUTH_CODES.length; i++) {
+    if (GLOBAL_AUTH_CODES[i].code === code) {
+      if (GLOBAL_AUTH_CODES[i].expire <= Date.now()) return { valid: false, reason: '授权码已过期' };
+      if (GLOBAL_AUTH_CODES[i].revoked) return { valid: false, reason: '授权码已被吊销' };
+      return { valid: true, entry: GLOBAL_AUTH_CODES[i], index: i };
+    }
+  }
+  return { valid: false, reason: '授权码无效' };
+}
+
+async function activateCode() {
+  var input = document.getElementById('activateCodeInput').value;
+  var result = validateAuthCode(input);
+  if (!result.valid) {
+    showToast(result.reason);
+    activateCooldown = Date.now() + 60000;
+    document.getElementById('activateCooldownTxt').textContent = '60秒后可重试';
+    var cd = setInterval(function () {
+      var remain = Math.ceil((activateCooldown - Date.now()) / 1000);
+      if (remain <= 0) { document.getElementById('activateCooldownTxt').textContent = ''; clearInterval(cd); }
+      else document.getElementById('activateCooldownTxt').textContent = remain + '秒后可重试';
+    }, 1000);
+    return;
+  }
+  var entry = result.entry;
+  var now = Date.now();
+  entry.lastActive = now;
+  activateCodeUsed = entry.code;
+  _vipExpiry = entry.expire;
+  _vipCache = true;
+  _vipChecked = true;
+  if (!saveMemberInfo()) {
+    _vipCache = false; _vipExpiry = 0;
+    updateVIPButton();
+    return;
+  }
+  syncAuthCodesToLS();
+  updateVIPButton();
+  closeActivateModal();
+  addAdminLog('授权码激活', entry.code);
+  var msg = '激活成功，有效期至 ' + new Date(_vipExpiry).toLocaleDateString('zh-CN');
+  if (GIST_ID && GITHUB_TOKEN) {
+    try {
+      var gistOk = await updateGistData(GLOBAL_AUTH_CODES);
+      msg = gistOk ? (msg + '，已同步云端') : (msg + '，云端同步失败');
+    } catch (e) { msg += '，云端同步失败'; }
+  }
+  showToast(msg);
+  setTimeout(function () { location.reload(); }, 2000);
+}
+
+function checkExpiryReminder() {
+  if (!_vipCache || _vipExpiry <= 0) return;
+  var remain = _vipExpiry - Date.now();
+  var daysLeft = Math.ceil(remain / 86400000);
+  if (daysLeft <= 7 && daysLeft > 0) {
+    var banner = document.getElementById('expiryBanner');
+    if (banner) {
+      banner.innerHTML = '您的会员还有 <strong>' + daysLeft + '</strong> 天到期，<a href="javascript:showVIPModal()" style="color:var(--accent);text-decoration:underline">点击续费</a>';
+      banner.className = 'expiry-banner show';
+    }
+  } else {
+    var banner = document.getElementById('expiryBanner');
+    if (banner) banner.className = 'expiry-banner';
+  }
+}
+
+function str2ab(str) { return new TextEncoder().encode(str); }
+
+async function sha256(data) {
+  var hash = await crypto.subtle.digest('SHA-256', str2ab(data));
+  return Array.from(new Uint8Array(hash)).map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+}
+
+// ===== 管理员系统 =====
+
+async function initAdminPwd() {
+  ADMIN_PWD_HASH = await sha256('tyl123' + ADMIN_SALT);
+}
+
+var _adminClickTimer = null;
+var _adminClickCount = 0;
+
+(function () {
+  var stored = localStorage.getItem('amzAdminClick');
+  if (stored) {
+    var parsed = parseInt(stored, 10);
+    if (!isNaN(parsed) && parsed >= 0 && parsed < 5) {
+      _adminClickCount = parsed;
+    }
+  }
+})();
+
+function _onAdminGearClick(e) {
+  e.stopPropagation();
+  e.stopImmediatePropagation();
+  _adminClickCount++;
+  if (_adminClickTimer) clearTimeout(_adminClickTimer);
+  localStorage.setItem('amzAdminClick', String(_adminClickCount));
+  if (_adminClickCount >= 5) {
+    _adminClickCount = 0;
+    localStorage.removeItem('amzAdminClick');
+    showAdminLogin();
+    return;
+  }
+  _adminClickTimer = setTimeout(function () {
+    _adminClickCount = 0;
+    localStorage.removeItem('amzAdminClick');
+  }, 2000);
+}
+
+function _initAdminEntry() {
+  var gear = document.getElementById('admin-gear');
+  if (!gear) return;
+  gear.addEventListener('click', _onAdminGearClick);
+  gear.addEventListener('mousedown', function (e) {
+    e.stopPropagation();
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', _initAdminEntry);
+} else {
+  _initAdminEntry();
+}
+
+function showAdminLogin() {
+  var now = Date.now();
+  if (now < adminLockUntil) {
+    var remain = Math.ceil((adminLockUntil - now) / 60000);
+    showToast('登录已锁定，请 ' + remain + ' 分钟后重试');
+    return;
+  }
+  document.getElementById('adminPwd').value = '';
+  document.getElementById('adminLoginModal').classList.add('show');
+}
+
+function closeAdminLogin() { document.getElementById('adminLoginModal').classList.remove('show'); }
+
+async function adminLogin() {
+  var pwd = document.getElementById('adminPwd').value;
+  var hash = await sha256(pwd + ADMIN_SALT);
+  if (hash === ADMIN_PWD_HASH) {
+    adminFailCount = 0;
+    document.getElementById('adminLoginModal').classList.remove('show');
+    document.getElementById('adminPanelModal').classList.add('show');
+    renderAuthCodeList();
+    renderAdminLogs();
+  } else {
+    adminFailCount++;
+    if (adminFailCount >= 5) {
+      adminLockUntil = Date.now() + 900000;
+      showToast('连续失败5次，锁定15分钟');
+      closeAdminLogin();
+    } else {
+      showToast('密码错误（剩余尝试：' + (5 - adminFailCount) + '次）');
+    }
+  }
+}
+
+function closeAdminPanel() { document.getElementById('adminPanelModal').classList.remove('show'); }
+
+function generateAuthCode() {
+  var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var seg = '';
+  for (var i = 0; i < 4; i++) seg += chars[Math.floor(Math.random() * chars.length)];
+  return 'AMZ-' + seg + '-' + (function () { var s = ''; for (var i = 0; i < 4; i++) s += chars[Math.floor(Math.random() * chars.length)]; return s; })();
+}
+
+async function adminGenCodes() {
+  var type = document.getElementById('adminCodeType').value;
+  var count = parseInt(document.getElementById('adminCodeCount').value) || 1;
+  var days = type === 'month' ? 30 : (type === 'quarter' ? 90 : 365);
+  var expire = Date.now() + days * 86400000;
+  var generated = [];
+  for (var i = 0; i < count; i++) {
+    var code = generateAuthCode();
+    GLOBAL_AUTH_CODES.push({ code: code, expire: expire, revoked: false, lastActive: 0 });
+    generated.push(code);
+  }
+  syncAuthCodesToLS();
+  if (GIST_ID && GITHUB_TOKEN) {
+    try { await updateGistData(GLOBAL_AUTH_CODES); } catch (e) {}
+  }
+  addAdminLog('批量生成授权码', count + '组 ' + (type === 'month' ? '月卡' : type === 'quarter' ? '季卡' : '年卡') + ' 到期：' + new Date(expire).toLocaleDateString('zh-CN'));
+  renderAuthCodeList();
+  showToast('已生成 ' + count + ' 组授权码');
+}
+
+async function adminRevokeCode(code) {
+  for (var i = 0; i < GLOBAL_AUTH_CODES.length; i++) {
+    if (GLOBAL_AUTH_CODES[i].code === code) {
+      GLOBAL_AUTH_CODES[i].revoked = true;
+      syncAuthCodesToLS();
+      if (GIST_ID && GITHUB_TOKEN) {
+        try { await updateGistData(GLOBAL_AUTH_CODES); } catch (e) {}
+      }
+      addAdminLog('吊销授权码', code);
+      renderAuthCodeList();
+      showToast('已吊销：' + code);
+      return;
+    }
+  }
+}
+
+async function adminRestoreCode(code) {
+  for (var i = 0; i < GLOBAL_AUTH_CODES.length; i++) {
+    if (GLOBAL_AUTH_CODES[i].code === code) {
+      GLOBAL_AUTH_CODES[i].revoked = false;
+      syncAuthCodesToLS();
+      if (GIST_ID && GITHUB_TOKEN) {
+        try { await updateGistData(GLOBAL_AUTH_CODES); } catch (e) {}
+      }
+      addAdminLog('恢复授权码', code);
+      renderAuthCodeList();
+      showToast('已恢复：' + code);
+      return;
+    }
+  }
+}
+
+function renderAuthCodeList() {
+  var now = Date.now();
+  var html = '';
+  if (GLOBAL_AUTH_CODES.length === 0) {
+    html = '<div style="font-size:12px;color:var(--text-muted);padding:16px;text-align:center">暂无授权码</div>';
+  } else {
+    html = '<table class="admin-table"><thead><tr><th>授权码</th><th>到期时间</th><th>最后活跃</th><th>状态</th><th>操作</th></tr></thead><tbody>';
+    for (var i = GLOBAL_AUTH_CODES.length - 1; i >= 0; i--) {
+      var c = GLOBAL_AUTH_CODES[i];
+      var expired = c.expire <= now;
+      var statusText, statusColor, actionHtml;
+      if (expired) {
+        statusText = '已过期'; statusColor = 'var(--danger)'; actionHtml = '-';
+      } else if (c.revoked) {
+        statusText = '已吊销'; statusColor = 'var(--danger)';
+        actionHtml = '<button class="admin-del-btn" style="background:#22C55E" onclick="adminRestoreCode(\'' + escapeHtml(c.code) + '\')">恢复</button>';
+      } else {
+        statusText = '正常'; statusColor = 'var(--success)';
+        var remain = c.expire - now;
+        if (remain < 7 * 86400000) statusColor = 'var(--warn)';
+        actionHtml = '<button class="admin-del-btn" onclick="adminRevokeCode(\'' + escapeHtml(c.code) + '\')">吊销</button>';
+      }
+      var expireStr = new Date(c.expire).toLocaleDateString('zh-CN');
+      var lastActiveStr = (c.lastActive && c.lastActive > 0) ? new Date(c.lastActive).toLocaleString('zh-CN') : '未激活';
+      html += '<tr>';
+      html += '<td>' + escapeHtml(c.code) + '</td>';
+      html += '<td>' + expireStr + '</td>';
+      html += '<td style="font-size:11px">' + lastActiveStr + '</td>';
+      html += '<td style="color:' + statusColor + '">' + statusText + '</td>';
+      html += '<td>' + actionHtml + '</td>';
+      html += '</tr>';
+    }
+    html += '</tbody></table>';
+  }
+  document.getElementById('adminCodeList').innerHTML = html;
+}
+
+function renderAdminLogs() {
+  var logs = getAdminLogs();
+  var html = '';
+  if (logs.length === 0) {
+    html = '<div style="font-size:11px;color:var(--text-muted);padding:8px;text-align:center">暂无操作记录</div>';
+  } else {
+    html = '<div class="admin-log">';
+    for (var i = 0; i < logs.length; i++) {
+      html += '<div class="admin-log-item">[' + logs[i].time + '] ' + logs[i].action + ' — ' + logs[i].detail + '</div>';
+    }
+    html += '</div>';
+  }
+  document.getElementById('adminLogContainer').innerHTML = html;
+}
+
+function _initModalListeners() {
+  var vipModal = document.getElementById('vipModal');
+  var actModal = document.getElementById('activateModal');
+  var admLogModal = document.getElementById('adminLoginModal');
+  var admPanModal = document.getElementById('adminPanelModal');
+  var admPwd = document.getElementById('adminPwd');
+  if (vipModal) vipModal.addEventListener('click', function (e) { if (e.target === this) closeVIPModal(); });
+  if (actModal) actModal.addEventListener('click', function (e) { if (e.target === this) closeActivateModal(); });
+  if (admLogModal) admLogModal.addEventListener('click', function (e) { if (e.target === this) closeAdminLogin(); });
+  if (admPanModal) admPanModal.addEventListener('click', function (e) { if (e.target === this) closeAdminPanel(); });
+  if (admPwd) admPwd.addEventListener('keydown', function (e) { if (e.key === 'Enter') adminLogin(); });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', _initModalListeners);
+} else {
+  _initModalListeners();
+}
+
+// Init — 版本号校验 + Gist云同步 + 强制清退旧会员 + merge localStorage 白名单
+(async function () {
+  var storedVer = _lsGet('amz_version');
+  if (storedVer !== CURRENT_VERSION) {
+    _lsRemove('amzMemberInfo');
+    _lsRemove('amzDeviceId');
+    _lsRemove('amzAdminClick');
+    _lsRemove('amz_version');
+    _lsSet('amz_version', CURRENT_VERSION);
+  }
+  try {
+    var gistData = await fetchGistData();
+    if (gistData && gistData.length) {
+      mergeGistIntoGlobal(gistData);
+    }
+  } catch (e) { console.warn('Gist同步失败，使用本地缓存'); }
+  var lsCodes = _lsGetJSON('amz_auth_codes');
+  if (lsCodes && lsCodes.length) {
+    for (var i = 0; i < lsCodes.length; i++) {
+      var dup = false;
+      for (var j = 0; j < GLOBAL_AUTH_CODES.length; j++) {
+        if (GLOBAL_AUTH_CODES[j].code === lsCodes[i].code) { dup = true; break; }
+      }
+      if (!dup) GLOBAL_AUTH_CODES.push(lsCodes[i]);
+    }
+  }
+  loadMemberInfo();
+  setInterval(function () {
+    loadMemberInfo();
+    checkExpiryReminder();
+  }, 1800000);
+  initAdminPwd();
+})();
+
+// ===== 防盗体系 =====
+
+// 禁用右键
+document.addEventListener('contextmenu', function (e) { e.preventDefault(); return false; });
+
+// 禁用快捷键
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'F12' ||
+    (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
+    (e.ctrlKey && e.key === 'u') ||
+    (e.ctrlKey && e.key === 'U') ||
+    (e.ctrlKey && e.key === 's') ||
+    (e.ctrlKey && e.key === 'S')) {
+    e.preventDefault();
+    return false;
+  }
+});
+
+// 调试工具检测
+setInterval(function () {
+  var before = Date.now();
+  debugger;
+  var after = Date.now();
+  if (after - before > 100) {
+    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-size:18px;color:var(--text);letter-spacing:2px;background:var(--bg)">请尊重开发者劳动，付费即可无限使用</div>';
+  }
+}, 2000);
+
+// DOM监控
+var _pageBackup = '';
+setTimeout(function () {
+  _pageBackup = document.documentElement.outerHTML;
+  var observer = new MutationObserver(function (mutations) {
+    for (var i = 0; i < mutations.length; i++) {
+      var m = mutations[i];
+      if (m.type === 'childList' && m.removedNodes.length > 0) {
+        for (var j = 0; j < m.removedNodes.length; j++) {
+          var node = m.removedNodes[j];
+          if (node.id === 'vipModal' || node.id === 'activateModal' || node.id === 'adminLoginModal' || node.id === 'adminPanelModal' || node.id === 'admin-gear') {
+            location.reload();
+            return;
+          }
+        }
+      }
+    }
+  });
+  observer.observe(document.documentElement, { childList: true, subtree: true });
+}, 1000);
+
+// 水印生成
+function generateWatermark() {
+  var layer = document.getElementById('watermarkLayer');
+  if (!layer) return;
+  var html = '';
+  var cols = 5, rows = 8;
+  for (var r = 0; r < rows; r++) {
+    for (var c = 0; c < cols; c++) {
+      var top = (r / rows) * 100;
+      var left = (c / cols) * 100;
+      html += '<span style="top:' + top + '%;left:' + left + '%">AMZ Tool &copy; 2026</span>';
+    }
+  }
+  layer.innerHTML = html;
+}
+generateWatermark();
+window.addEventListener('resize', generateWatermark);
+</script>
+
+<!-- 会员弹窗 -->
+<div class="modal-overlay" id="vipModal">
+  <div class="modal-dialog">
+    <button class="modal-close" onclick="closeVIPModal()">&times;</button>
+    <div class="modal-title">开通会员</div>
+    <div class="plan-grid">
+      <div class="plan-card">
+        <div class="plan-name">月卡（30天）</div>
+        <div class="plan-price">19.9<span class="plan-unit">元/月</span></div>
+        <div class="plan-desc">所有模块无限次使用</div>
+        <img class="plan-qr" src="https://backup.fukit.cn/autoupload/f/pNAFWI3tPHUq_bGP-T8tDaNdx9J-4ccugcpyhybV9Yo/20260527/yNKd/557X557/pay.png/webp" alt="微信收款码">
+        <div class="plan-qr-label">微信扫码支付</div>
+      </div>
+      <div class="plan-card featured">
+        <div class="plan-name">季卡（90天）</div>
+        <div class="plan-price">49.9<span class="plan-unit">元/季</span></div>
+        <div class="plan-desc">合16.6元/月 · 所有模块无限次使用</div>
+        <img class="plan-qr" src="https://backup.fukit.cn/autoupload/f/pNAFWI3tPHUq_bGP-T8tDaNdx9J-4ccugcpyhybV9Yo/20260527/yNKd/557X557/pay.png/webp" alt="微信收款码">
+        <div class="plan-qr-label">微信扫码支付</div>
+      </div>
+      <div class="plan-card">
+        <div class="plan-name">年卡（365天）</div>
+        <div class="plan-price">149<span class="plan-unit">元/年</span></div>
+        <div class="plan-desc">合12.4元/月 · 所有模块无限次使用</div>
+        <img class="plan-qr" src="https://backup.fukit.cn/autoupload/f/pNAFWI3tPHUq_bGP-T8tDaNdx9J-4ccugcpyhybV9Yo/20260527/yNKd/557X557/pay.png/webp" alt="微信收款码">
+        <div class="plan-qr-label">微信扫码支付</div>
+      </div>
+    </div>
+    <div class="modal-note">付款后请联系微信 <strong>tmsx110</strong>，获取授权码激活会员<br>一个授权码仅支持单设备绑定使用，更换设备可联系客服重置绑定</div>
+  </div>
+</div>
+
+<!-- 激活会员弹窗 -->
+<div class="modal-overlay" id="activateModal">
+  <div class="modal-dialog" style="max-width:400px">
+    <button class="modal-close" onclick="closeActivateModal()">&times;</button>
+    <div class="modal-title">激活会员</div>
+    <div class="admin-form">
+      <label class="form-label">授权码</label>
+      <input type="text" id="activateCodeInput" placeholder="格式：AMZ-XXXX-XXXX" style="text-transform:uppercase;letter-spacing:2px">
+    </div>
+    <button class="btn-detect" onclick="activateCode()" style="width:100%;margin-bottom:8px">激活</button>
+    <div class="activate-cooldown" id="activateCooldownTxt"></div>
+    <div class="modal-note">付款后联系微信 <strong>tmsx110</strong> 获取授权码</div>
+  </div>
+</div>
+
+<!-- 管理员登录弹窗 -->
+<div class="modal-overlay" id="adminLoginModal">
+  <div class="modal-dialog" style="max-width:360px">
+    <button class="modal-close" onclick="closeAdminLogin()">&times;</button>
+    <div class="modal-title">管理员登录</div>
+    <div class="admin-form">
+      <label class="form-label">管理员密码</label>
+      <input type="password" id="adminPwd" placeholder="请输入密码">
+    </div>
+    <button class="btn-detect" onclick="adminLogin()" style="width:100%">登录</button>
+  </div>
+</div>
+
+<!-- 管理员面板弹窗 -->
+<div class="modal-overlay" id="adminPanelModal">
+  <div class="modal-dialog" style="max-width:620px">
+    <button class="modal-close" onclick="closeAdminPanel()">&times;</button>
+    <div class="modal-title">会员管理</div>
+    <div style="display:flex;gap:10px;align-items:flex-end;margin-bottom:16px">
+      <div class="admin-form" style="flex:1;margin-bottom:0">
+        <label class="form-label">套餐类型</label>
+        <select id="adminCodeType"><option value="month">月卡（30天）</option><option value="quarter">季卡（90天）</option><option value="year">年卡（365天）</option></select>
+      </div>
+      <div class="admin-form" style="flex:1;margin-bottom:0">
+        <label class="form-label">生成数量</label>
+        <select id="adminCodeCount"><option value="1">1组</option><option value="5">5组</option><option value="10">10组</option></select>
+      </div>
+      <button class="btn-detect" onclick="adminGenCodes()" style="flex:0 0 auto;margin-top:18px;padding:10px 20px">生成授权码</button>
+    </div>
+    <div style="font-size:12px;color:var(--text-muted);letter-spacing:1px;margin-bottom:8px">授权码列表</div>
+    <div id="adminCodeList"></div>
+    <div style="font-size:12px;color:var(--text-muted);letter-spacing:1px;margin:16px 0 8px">操作日志</div>
+    <div id="adminLogContainer"></div>
+  </div>
+</div>
+
+<!-- 管理员隐藏入口 -->
+<button class="admin-gear" id="admin-gear" title="">
+  <svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+</button>
+
+<!-- 到期提醒横幅 -->
+<div class="expiry-banner" id="expiryBanner"></div>
+
+<!-- 水印层 -->
+<div class="watermark-overlay" id="watermarkLayer"></div>
+
+<!-- 页脚 -->
+<footer class="site-footer">&copy; 2026 TYL | 亚马逊运营工具箱 个人开发 &middot; 工具仅作运营辅助，数据仅供参考，与亚马逊平台无关联</footer>
+
+</body>
+</html>
