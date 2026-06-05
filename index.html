@@ -4384,7 +4384,7 @@ function loadMemberInfo() {
   _vipChecked = true;
   var data = _lsGetJSON('amzMemberInfo');
   if (!data) { _vipCache = false; _vipExpiry = 0; return false; }
- if (!/^(AMZ-[A-Z0-9]{4}-[A-Z0-9]{4}|AMZ-(MNT|SEA|YER)-[0-9]{4})$/.test(data.code || '')) {
+if (!/^(AMZ-[A-Z0-9]{3}-[A-Z0-9]{3}|AMZ-(TEST|USER|MNT|SEA|YER)-[0-9]{4})$/.test(data.code || '')) {
     _lsRemove('amzMemberInfo'); _vipCache = false; _vipExpiry = 0; return false;
   }
   if (data.expiry <= Date.now()) {
@@ -4499,7 +4499,7 @@ function addAdminLog(action, detail) {
 
 function validateAuthCode(code) {
   code = code.toUpperCase().trim();
-  if (!/^AMZ-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(code)) return { valid: false, reason: '授权码格式错误' };
+  if (!/^(AMZ-[A-Z0-9]{3}-[A-Z0-9]{3}|AMZ-(TEST|USER|MNT|SEA|YER)-[0-9]{4})$/.test(code)) return { valid: false, reason: '授权码格式错误' };
   for (var i = 0; i < GLOBAL_AUTH_CODES.length; i++) {
     if (GLOBAL_AUTH_CODES[i].code === code) {
       if (GLOBAL_AUTH_CODES[i].expire <= Date.now()) return { valid: false, reason: '授权码已过期' };
