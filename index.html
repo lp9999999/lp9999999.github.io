@@ -3830,6 +3830,7 @@ pcInit();
 // --- 文案格式化 ---
 
 function otFormatText() {
+  if (!useModule('ot_format')) return;
   var raw = document.getElementById('otFormatInput').value;
   if (!raw.trim()) { showToast('请先粘贴需要格式化的文案'); return; }
 
@@ -4122,6 +4123,7 @@ function otExtractCoreWords(input) {
 }
 
 function otMatchCategory() {
+  if (!useModule('ot_category')) return;
   var input = document.getElementById('otCatKeywords').value.trim();
   if (!input) { showToast('请输入产品关键词'); return; }
 
@@ -4234,6 +4236,7 @@ function otClearCategory() {
 // --- 备货预估 ---
 
 function otCalcInventory() {
+  if (!useModule('ot_inventory')) return;
   var daily = parseFloat(document.getElementById('otDailySales').value);
   var prep  = parseFloat(document.getElementById('otPrepDays').value);
   var safety = parseFloat(document.getElementById('otSafetyDays').value);
@@ -4277,9 +4280,10 @@ function otClearInventory() {
 
 // ===== 会员系统 v5（硬编码全局白名单 + Gist云同步 + 跨设备顶号） =====
 
-// === Gist云同步配置（已内置Gist地址和Token） ===
+// === Gist云同步配置（读取+激活状态同步） ===
 var GIST_RAW_URL = "https://gist.githubusercontent.com/lp9999999/822700c8094511bb42bc1142feda9c06/raw/members.json";
 var GIST_ID = '822700c8094511bb42bc1142feda9c06';
+var GITHUB_TOKEN = 'YOUR_GITHUB_PERSONAL_ACCESS_TOKEN';
 
 const FORCE_GLOBAL_SYNC = true;
 const GLOBAL_AUTH_CODES = [];
@@ -4336,8 +4340,9 @@ async function fetchGistData() {
   } catch (e) { return null; }
 }
 
+// 激活状态同步写入Gist（仅用于激活时更新activated/activatedAt）
 async function updateGistData(codes) {
-  if (!GIST_ID || !GITHUB_TOKEN) return false;
+  if (!GIST_ID || !GITHUB_TOKEN || GITHUB_TOKEN === 'YOUR_GITHUB_PERSONAL_ACCESS_TOKEN') return false;
   try {
     var resp = await fetch('https://api.github.com/gists/' + GIST_ID, {
       method: 'PATCH',
@@ -4363,6 +4368,8 @@ function mergeGistIntoGlobal(gistData) {
     var gc = gistData[k];
     if (!gc.hasOwnProperty('lastActive')) gc.lastActive = 0;
     if (!gc.hasOwnProperty('revoked')) gc.revoked = false;
+    if (!gc.hasOwnProperty('activated')) gc.activated = false;
+    if (!gc.hasOwnProperty('activatedAt')) gc.activatedAt = '';
     existingCodes[gc.code] = gc;
   }
   GLOBAL_AUTH_CODES.length = 0;
@@ -4370,6 +4377,17 @@ function mergeGistIntoGlobal(gistData) {
     GLOBAL_AUTH_CODES.push(existingCodes[code]);
   }
   syncAuthCodesToLS();
+}
+
+async function refreshCodes() {
+  try {
+    var gistData = await fetchGistData();
+    if (!gistData || !gistData.length) { showToast('云端数据为空，请检查Gist配置或网络'); return; }
+    GLOBAL_AUTH_CODES.length = 0;
+    mergeGistIntoGlobal(gistData);
+    showToast('已刷新，共 ' + GLOBAL_AUTH_CODES.length + ' 条卡密');
+    if (typeof renderAuthCodeList === 'function') renderAuthCodeList();
+  } catch (e) { showToast('刷新失败，请检查网络或Token配置'); }
 }
 
 function saveMemberInfo() {
@@ -4454,7 +4472,7 @@ function useModule(name) {
   var data = _lsGetJSON(key);
   if (!data || data.date !== today) { data = { date: today, count: 0 }; }
   if (data.count >= 3) {
-    showToast('今日次数已用完，明日0点自动重置或开通会员无限使用');
+    showToast('该工具免费试用次数已用完，请开通会员继续使用');
     return false;
   }
   data.count++;
@@ -4527,11 +4545,15 @@ async function activateCode() {
   var entry = result.entry;
   var now = Date.now();
   entry.lastActive = now;
+  entry.activated = true;
+  entry.activatedAt = new Date().toLocaleString('zh-CN');
   activateCodeUsed = entry.code;
   _vipExpiry = entry.expire;
   _vipCache = true;
   _vipChecked = true;
   if (!saveMemberInfo()) {
+    // 保存失败，回滚激活状态
+    entry.activated = false; entry.activatedAt = '';
     _vipCache = false; _vipExpiry = 0;
     updateVIPButton();
     return;
@@ -4541,10 +4563,10 @@ async function activateCode() {
   closeActivateModal();
   addAdminLog('授权码激活', entry.code);
   var msg = '激活成功，有效期至 ' + new Date(_vipExpiry).toLocaleDateString('zh-CN');
-  if (GIST_ID && GITHUB_TOKEN) {
+  if (GIST_ID && GITHUB_TOKEN && GITHUB_TOKEN !== 'YOUR_GITHUB_PERSONAL_ACCESS_TOKEN') {
     try {
       var gistOk = await updateGistData(GLOBAL_AUTH_CODES);
-      msg = gistOk ? (msg + '，已同步云端') : (msg + '，云端同步失败');
+      msg += gistOk ? '，已同步云端' : '，云端同步失败';
     } catch (e) { msg += '，云端同步失败'; }
   }
   showToast(msg);
@@ -4662,95 +4684,37 @@ async function adminLogin() {
 
 function closeAdminPanel() { document.getElementById('adminPanelModal').classList.remove('show'); }
 
-function generateAuthCode() {
-  var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  var seg = '';
-  for (var i = 0; i < 4; i++) seg += chars[Math.floor(Math.random() * chars.length)];
-  return 'AMZ-' + seg + '-' + (function () { var s = ''; for (var i = 0; i < 4; i++) s += chars[Math.floor(Math.random() * chars.length)]; return s; })();
-}
-
-async function adminGenCodes() {
-  var type = document.getElementById('adminCodeType').value;
-  var count = parseInt(document.getElementById('adminCodeCount').value) || 1;
-  var days = type === 'month' ? 30 : (type === 'quarter' ? 90 : 365);
-  var expire = Date.now() + days * 86400000;
-  var generated = [];
-  for (var i = 0; i < count; i++) {
-    var code = generateAuthCode();
-    GLOBAL_AUTH_CODES.push({ code: code, expire: expire, revoked: false, lastActive: 0 });
-    generated.push(code);
-  }
-  syncAuthCodesToLS();
-  if (GIST_ID && GITHUB_TOKEN) {
-    try { await updateGistData(GLOBAL_AUTH_CODES); } catch (e) {}
-  }
-  addAdminLog('批量生成授权码', count + '组 ' + (type === 'month' ? '月卡' : type === 'quarter' ? '季卡' : '年卡') + ' 到期：' + new Date(expire).toLocaleDateString('zh-CN'));
-  renderAuthCodeList();
-  showToast('已生成 ' + count + ' 组授权码');
-}
-
-async function adminRevokeCode(code) {
-  for (var i = 0; i < GLOBAL_AUTH_CODES.length; i++) {
-    if (GLOBAL_AUTH_CODES[i].code === code) {
-      GLOBAL_AUTH_CODES[i].revoked = true;
-      syncAuthCodesToLS();
-      if (GIST_ID && GITHUB_TOKEN) {
-        try { await updateGistData(GLOBAL_AUTH_CODES); } catch (e) {}
-      }
-      addAdminLog('吊销授权码', code);
-      renderAuthCodeList();
-      showToast('已吊销：' + code);
-      return;
-    }
-  }
-}
-
-async function adminRestoreCode(code) {
-  for (var i = 0; i < GLOBAL_AUTH_CODES.length; i++) {
-    if (GLOBAL_AUTH_CODES[i].code === code) {
-      GLOBAL_AUTH_CODES[i].revoked = false;
-      syncAuthCodesToLS();
-      if (GIST_ID && GITHUB_TOKEN) {
-        try { await updateGistData(GLOBAL_AUTH_CODES); } catch (e) {}
-      }
-      addAdminLog('恢复授权码', code);
-      renderAuthCodeList();
-      showToast('已恢复：' + code);
-      return;
-    }
-  }
-}
-
 function renderAuthCodeList() {
   var now = Date.now();
   var html = '';
   if (GLOBAL_AUTH_CODES.length === 0) {
     html = '<div style="font-size:12px;color:var(--text-muted);padding:16px;text-align:center">暂无授权码</div>';
   } else {
-    html = '<table class="admin-table"><thead><tr><th>授权码</th><th>到期时间</th><th>最后活跃</th><th>状态</th><th>操作</th></tr></thead><tbody>';
+    html = '<table class="admin-table"><thead><tr><th>授权码</th><th>套餐类型</th><th>到期时间</th><th>状态</th></tr></thead><tbody>';
     for (var i = GLOBAL_AUTH_CODES.length - 1; i >= 0; i--) {
       var c = GLOBAL_AUTH_CODES[i];
+      // 套餐类型：从code解析（MNT=月卡/SEA=季卡/YER=年卡）
+      var typeStr = '未知';
+      if (c.code.indexOf('MNT') >= 0) typeStr = '月卡';
+      else if (c.code.indexOf('SEA') >= 0) typeStr = '季卡';
+      else if (c.code.indexOf('YER') >= 0) typeStr = '年卡';
       var expired = c.expire <= now;
-      var statusText, statusColor, actionHtml;
+      var statusText, statusColor;
       if (expired) {
-        statusText = '已过期'; statusColor = 'var(--danger)'; actionHtml = '-';
+        statusText = '已过期'; statusColor = 'var(--danger)';
       } else if (c.revoked) {
         statusText = '已吊销'; statusColor = 'var(--danger)';
-        actionHtml = '<button class="admin-del-btn" style="background:#22C55E" onclick="adminRestoreCode(\'' + escapeHtml(c.code) + '\')">恢复</button>';
       } else {
         statusText = '正常'; statusColor = 'var(--success)';
         var remain = c.expire - now;
         if (remain < 7 * 86400000) statusColor = 'var(--warn)';
-        actionHtml = '<button class="admin-del-btn" onclick="adminRevokeCode(\'' + escapeHtml(c.code) + '\')">吊销</button>';
       }
       var expireStr = new Date(c.expire).toLocaleDateString('zh-CN');
-      var lastActiveStr = (c.lastActive && c.lastActive > 0) ? new Date(c.lastActive).toLocaleString('zh-CN') : '未激活';
       html += '<tr>';
       html += '<td>' + escapeHtml(c.code) + '</td>';
+      html += '<td>' + typeStr + '</td>';
       html += '<td>' + expireStr + '</td>';
-      html += '<td style="font-size:11px">' + lastActiveStr + '</td>';
       html += '<td style="color:' + statusColor + '">' + statusText + '</td>';
-      html += '<td>' + actionHtml + '</td>';
       html += '</tr>';
     }
     html += '</tbody></table>';
@@ -4792,7 +4756,7 @@ if (document.readyState === 'loading') {
   _initModalListeners();
 }
 
-// Init — 版本号校验 + Gist云同步 + 强制清退旧会员 + merge localStorage 白名单
+// Init — 版本号校验 + Gist云同步 + merge localStorage 白名单
 (async function () {
   var storedVer = _lsGet('amz_version');
   if (storedVer !== CURRENT_VERSION) {
@@ -4933,7 +4897,7 @@ window.addEventListener('resize', generateWatermark);
     <div class="modal-title">激活会员</div>
     <div class="admin-form">
       <label class="form-label">授权码</label>
-      <input type="text" id="activateCodeInput" placeholder="格式：AMZ-XXXX-XXXX" style="text-transform:uppercase;letter-spacing:2px">
+      <input type="text" id="activateCodeInput" autocomplete="off" placeholder="格式：AMZ-XXXX-XXXX" style="text-transform:uppercase;letter-spacing:2px">
     </div>
     <button class="btn-detect" onclick="activateCode()" style="width:100%;margin-bottom:8px">激活</button>
     <div class="activate-cooldown" id="activateCooldownTxt"></div>
@@ -4960,15 +4924,7 @@ window.addEventListener('resize', generateWatermark);
     <button class="modal-close" onclick="closeAdminPanel()">&times;</button>
     <div class="modal-title">会员管理</div>
     <div style="display:flex;gap:10px;align-items:flex-end;margin-bottom:16px">
-      <div class="admin-form" style="flex:1;margin-bottom:0">
-        <label class="form-label">套餐类型</label>
-        <select id="adminCodeType"><option value="month">月卡（30天）</option><option value="quarter">季卡（90天）</option><option value="year">年卡（365天）</option></select>
-      </div>
-      <div class="admin-form" style="flex:1;margin-bottom:0">
-        <label class="form-label">生成数量</label>
-        <select id="adminCodeCount"><option value="1">1组</option><option value="5">5组</option><option value="10">10组</option></select>
-      </div>
-      <button class="btn-detect" onclick="adminGenCodes()" style="flex:0 0 auto;margin-top:18px;padding:10px 20px">生成授权码</button>
+      <button class="btn-detect" onclick="refreshCodes()" style="flex:0 0 auto;margin-top:0;padding:10px 16px;background:#6366F1">刷新卡密</button>
     </div>
     <div style="font-size:12px;color:var(--text-muted);letter-spacing:1px;margin-bottom:8px">授权码列表</div>
     <div id="adminCodeList"></div>
